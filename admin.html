@@ -536,15 +536,277 @@ tr:hover td{background:rgba(255,255,255,0.02)}
       </div>
     </div>
 
-    <!-- ============ OTHER PAGES (placeholder) ============ -->
-    <div class="page" id="page-devices"><div class="topbar"><div><h1>Devices</h1><div class="subtitle">All ARGES hardware units</div></div></div><div class="panel"><div class="panel-title">Device management coming in full build</div></div></div>
-    <div class="page" id="page-families"><div class="topbar"><div><h1>Family Trees</h1><div class="subtitle">View and manage family connections</div></div></div><div class="panel"><div class="panel-title">Family tree management coming in full build</div></div></div>
-    <div class="page" id="page-helpers"><div class="topbar"><div><h1>Helpers</h1><div class="subtitle">Echo Network volunteers</div></div></div><div class="panel"><div class="panel-title">Helper management coming in full build</div></div></div>
-    <div class="page" id="page-alerts"><div class="topbar"><div><h1>Alerts</h1><div class="subtitle">System and SOS alerts</div></div></div><div class="panel"><div class="panel-title">Alert management coming in full build</div></div></div>
-    <div class="page" id="page-server"><div class="topbar"><div><h1>Server Health</h1><div class="subtitle">Real-time infrastructure monitoring</div></div></div><div class="panel"><div class="panel-title">Detailed health metrics coming in full build</div></div></div>
-    <div class="page" id="page-updates"><div class="topbar"><div><h1>Updates & OTA</h1><div class="subtitle">Push firmware updates to devices</div></div></div><div class="panel"><div class="panel-title">OTA management coming in full build</div></div></div>
-    <div class="page" id="page-settings"><div class="topbar"><div><h1>Settings</h1><div class="subtitle">Admin configuration</div></div></div><div class="panel"><div class="panel-title">Settings coming in full build</div></div></div>
-    <div class="page" id="page-analytics"><div class="topbar"><div><h1>Analytics</h1><div class="subtitle">Usage insights and growth metrics</div></div></div><div class="panel"><div class="panel-title">Analytics dashboard coming in full build</div></div></div>
+    <!-- ============ DEVICES PAGE ============ -->
+    <div class="page" id="page-devices">
+      <div class="topbar">
+        <div><h1>Devices</h1><div class="subtitle">All ARGES hardware units · 1,924 online · 87 offline</div></div>
+        <div class="topbar-actions">
+          <input class="topbar-search" placeholder="Search devices...">
+          <button class="btn" onclick="openModal('otaPush')">Push OTA Update</button>
+        </div>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-icon green"><svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div><div class="stat-value">1,924</div><div class="stat-label">Online Devices</div><div class="stat-trend up">↑ 12 today</div></div>
+        <div class="stat-card"><div class="stat-icon orange"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div class="stat-value">96%</div><div class="stat-label">Avg Uptime (30d)</div></div>
+        <div class="stat-card"><div class="stat-icon blue"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/></svg></div><div class="stat-value">v2.1.3</div><div class="stat-label">Latest Firmware</div></div>
+        <div class="stat-card"><div class="stat-icon purple"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div><div class="stat-value">1,807</div><div class="stat-label">Devices on Latest FW</div></div>
+      </div>
+      <div class="panel">
+        <div class="panel-header"><div><div class="panel-title">All Devices</div><div class="panel-sub">Firmware distribution: 94% v2.1.3 · 4% v2.0.8 · 2% older</div></div>
+          <div style="display:flex;gap:8px"><button class="btn btn-ghost btn-sm">Filter Status</button><button class="btn btn-ghost btn-sm">Filter Firmware</button></div>
+        </div>
+        <div class="device-grid" id="devicesGrid"></div>
+      </div>
+    </div>
+
+    <!-- ============ FAMILY TREES PAGE ============ -->
+    <div class="page" id="page-families">
+      <div class="topbar">
+        <div><h1>Family Trees</h1><div class="subtitle">Visualize and manage family connections</div></div>
+        <div class="topbar-actions">
+          <input class="topbar-search" placeholder="Search families...">
+          <button class="btn" onclick="openModal('addFamily')">+ New Family</button>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="panel">
+          <div class="panel-header"><div><div class="panel-title">Ravi Kumar's Family</div><div class="panel-sub">5 members · Connected to ARGES-0014</div></div><span class="badge green"><span class="dot"></span>Active</span></div>
+          <!-- Visual family tree -->
+          <div style="padding:20px 0;display:flex;flex-direction:column;align-items:center;gap:16px">
+            <!-- Gen 1: Blind user -->
+            <div style="display:flex;flex-direction:column;align-items:center;gap:8px">
+              <div class="user-avatar blind" style="width:56px;height:56px;font-size:1.1rem">RA</div>
+              <div style="text-align:center"><div style="font-weight:600;font-size:0.9rem">Ravi Kumar</div><div style="font-size:0.72rem;color:var(--orange)">Blind User</div></div>
+            </div>
+            <div style="width:1px;height:20px;background:var(--glass-border-hi)"></div>
+            <!-- Gen 2: Parents -->
+            <div style="display:flex;gap:60px">
+              <div style="display:flex;flex-direction:column;align-items:center;gap:6px">
+                <div class="user-avatar family" style="width:48px;height:48px;font-size:0.9rem">LA</div>
+                <div style="text-align:center"><div style="font-size:0.82rem;font-weight:600">Lakshmi</div><div style="font-size:0.68rem;color:var(--muted)">Mother</div></div>
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:6px">
+                <div class="user-avatar family" style="width:48px;height:48px;font-size:0.9rem">SR</div>
+                <div style="text-align:center"><div style="font-size:0.82rem;font-weight:600">Suresh</div><div style="font-size:0.68rem;color:var(--muted)">Father</div></div>
+              </div>
+            </div>
+            <div style="width:120px;height:1px;background:var(--glass-border-hi)"></div>
+            <!-- Gen 3: Siblings -->
+            <div style="display:flex;gap:40px">
+              <div style="display:flex;flex-direction:column;align-items:center;gap:6px">
+                <div class="user-avatar family" style="width:44px;height:44px;font-size:0.82rem">KA</div>
+                <div style="text-align:center"><div style="font-size:0.78rem;font-weight:600">Karthik</div><div style="font-size:0.66rem;color:var(--muted)">Brother</div></div>
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:6px">
+                <div class="user-avatar family" style="width:44px;height:44px;font-size:0.82rem">PR</div>
+                <div style="text-align:center"><div style="font-size:0.78rem;font-weight:600">Priya</div><div style="font-size:0.66rem;color:var(--muted)">Sister</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-header"><div><div class="panel-title">All Families</div><div class="panel-sub">1,203 family trees registered</div></div></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Blind User</th><th>Members</th><th>Relations</th><th>Created</th></tr></thead>
+              <tbody id="familiesTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ HELPERS PAGE ============ -->
+    <div class="page" id="page-helpers">
+      <div class="topbar">
+        <div><h1>Helpers</h1><div class="subtitle">Echo Network volunteers providing remote vision</div></div>
+        <div class="topbar-actions">
+          <input class="topbar-search" placeholder="Search helpers...">
+          <button class="btn" onclick="openModal('addUser')">+ Add Helper</button>
+        </div>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-icon green"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div><div class="stat-value">486</div><div class="stat-label">Active Helpers</div><div class="stat-trend up">↑ 8 new</div></div>
+        <div class="stat-card"><div class="stat-icon orange"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div class="stat-value">1,247</div><div class="stat-label">Help Sessions (30d)</div></div>
+        <div class="stat-card"><div class="stat-icon blue"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div><div class="stat-value">4.8</div><div class="stat-label">Avg Rating</div></div>
+        <div class="stat-card"><div class="stat-icon purple"><svg viewBox="0 0 24 24"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/></svg></div><div class="stat-value">2.4s</div><div class="stat-label">Avg Response Time</div></div>
+      </div>
+      <div class="panel">
+        <div class="panel-header"><div><div class="panel-title">Helper Leaderboard</div><div class="panel-sub">Top volunteers by help sessions this month</div></div></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Rank</th><th>Helper</th><th>Location</th><th>Sessions</th><th>Rating</th><th>Status</th><th>Badges</th></tr></thead>
+            <tbody id="helpersTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ ALERTS PAGE ============ -->
+    <div class="page" id="page-alerts">
+      <div class="topbar">
+        <div><h1>Alerts</h1><div class="subtitle">SOS, falls, hazards, and system alerts</div></div>
+        <div class="topbar-actions">
+          <button class="btn btn-ghost">Resolve All</button>
+          <button class="btn" onclick="openModal('broadcast')">Broadcast</button>
+        </div>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-icon orange"><svg viewBox="0 0 24 24"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/></svg></div><div class="stat-value">3</div><div class="stat-label">Critical (Unresolved)</div></div>
+        <div class="stat-card"><div class="stat-icon red"><svg viewBox="0 0 24 24"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg></div><div class="stat-value">47</div><div class="stat-label">SOS Events (7d)</div></div>
+        <div class="stat-card"><div class="stat-icon yellow"><svg viewBox="0 0 24 24"><path d="M12 2L2 22h20L12 2z"/></svg></div><div class="stat-value">112</div><div class="stat-label">Fall Detections (7d)</div></div>
+        <div class="stat-card"><div class="stat-icon green"><svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div><div class="stat-value">98%</div><div class="stat-label">Resolution Rate</div></div>
+      </div>
+      <div class="panel">
+        <div class="panel-header"><div><div class="panel-title">Alert Timeline</div><div class="panel-sub">Most recent first · Click to view details</div></div>
+          <div style="display:flex;gap:8px"><button class="btn btn-ghost btn-sm">All</button><button class="btn btn-ghost btn-sm">SOS</button><button class="btn btn-ghost btn-sm">Falls</button><button class="btn btn-ghost btn-sm">Unresolved</button></div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Type</th><th>User</th><th>Location</th><th>Time</th><th>Status</th><th>Action</th></tr></thead>
+            <tbody id="alertsTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ SERVER HEALTH PAGE ============ -->
+    <div class="page" id="page-server">
+      <div class="topbar">
+        <div><h1>Server Health</h1><div class="subtitle">Real-time infrastructure monitoring</div></div>
+        <div class="topbar-actions"><span class="badge green"><span class="dot"></span>All Systems Operational</span></div>
+      </div>
+      <div class="grid-2">
+        <div class="panel">
+          <div class="panel-header"><div><div class="panel-title">Service Status</div></div></div>
+          <div class="health-row"><div class="health-label"><span class="dot green"></span>API Server (FastAPI)</div><div class="health-value">42ms · 99.9% uptime</div></div>
+          <div class="health-row"><div class="health-label"><span class="dot green"></span>Database (Supabase)</div><div class="health-value">8ms · 99.9%</div></div>
+          <div class="health-row"><div class="health-label"><span class="dot green"></span>LiveKit Streaming</div><div class="health-value">24ms · 99.8%</div></div>
+          <div class="health-row"><div class="health-label"><span class="dot yellow"></span>Bhashini (TTS/STT)</div><div class="health-value">180ms · 97.2%</div></div>
+          <div class="health-row"><div class="health-label"><span class="dot green"></span>OTA Update Server</div><div class="health-value">12ms · 100%</div></div>
+          <div class="health-row"><div class="health-label"><span class="dot green"></span>CDN (Vercel)</div><div class="health-value">18ms · 99.9%</div></div>
+          <div class="health-row"><div class="health-label"><span class="dot green"></span>Push Notifications (FCM)</div><div class="health-value">35ms · 99.7%</div></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:20px">
+          <div class="panel">
+            <div class="panel-header"><div><div class="panel-title">API Response Time</div><div class="panel-sub">Last 24 hours</div></div></div>
+            <div id="apiChart" style="height:120px;display:flex;align-items:flex-end;gap:3px;padding:0 4px"></div>
+          </div>
+          <div class="panel">
+            <div class="panel-header"><div><div class="panel-title">System Resources</div></div></div>
+            <div style="display:flex;flex-direction:column;gap:12px;padding:8px 0">
+              <div><div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:0.82rem">CPU Usage</span><span style="font-size:0.82rem;font-family:'JetBrains Mono',monospace;color:var(--green-bright)">23%</span></div><div style="height:6px;background:var(--glass-border-hi);border-radius:999px;overflow:hidden"><div style="height:100%;width:23%;background:var(--green-bright);border-radius:999px"></div></div></div>
+              <div><div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:0.82rem">Memory</span><span style="font-size:0.82rem;font-family:'JetBrains Mono',monospace;color:var(--yellow)">67%</span></div><div style="height:6px;background:var(--glass-border-hi);border-radius:999px;overflow:hidden"><div style="height:100%;width:67%;background:var(--yellow);border-radius:999px"></div></div></div>
+              <div><div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:0.82rem">Disk</span><span style="font-size:0.82rem;font-family:'JetBrains Mono',monospace;color:var(--green-bright)">41%</span></div><div style="height:6px;background:var(--glass-border-hi);border-radius:999px;overflow:hidden"><div style="height:100%;width:41%;background:var(--green-bright);border-radius:999px"></div></div></div>
+              <div><div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:0.82rem">Bandwidth</span><span style="font-size:0.82rem;font-family:'JetBrains Mono',monospace;color:var(--orange)">78%</span></div><div style="height:6px;background:var(--glass-border-hi);border-radius:999px;overflow:hidden"><div style="height:100%;width:78%;background:var(--orange);border-radius:999px"></div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ UPDATES / OTA PAGE ============ -->
+    <div class="page" id="page-updates">
+      <div class="topbar">
+        <div><h1>Updates & OTA</h1><div class="subtitle">Push firmware updates to ARGES devices</div></div>
+        <div class="topbar-actions"><button class="btn" onclick="openModal('otaPush')">+ New OTA Campaign</button></div>
+      </div>
+      <div class="grid-2">
+        <div class="panel">
+          <div class="panel-header"><div><div class="panel-title">Firmware Versions</div><div class="panel-sub">Distribution across all devices</div></div></div>
+          <div style="padding:8px 0">
+            <div class="health-row"><div class="health-label" style="font-family:'JetBrains Mono',monospace;color:var(--green-bright)">v2.1.3 (latest)</div><div class="health-value">1,807 devices · 94%</div></div>
+            <div class="health-row"><div class="health-label" style="font-family:'JetBrains Mono',monospace;color:var(--yellow)">v2.0.8</div><div class="health-value">77 devices · 4%</div></div>
+            <div class="health-row"><div class="health-label" style="font-family:'JetBrains Mono',monospace;color:var(--muted)">v1.9.x (legacy)</div><div class="health-value">38 devices · 2%</div></div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-header"><div><div class="panel-title">Active OTA Campaigns</div></div></div>
+          <div style="padding:12px 0">
+            <div style="padding:16px;background:rgba(255,107,26,0.05);border:0.5px solid rgba(255,107,26,0.15);border-radius:16px;margin-bottom:12px">
+              <div style="display:flex;justify-content:space-between;margin-bottom:10px"><span style="font-weight:600;font-size:0.9rem">v2.1.3 → v2.2.0 Rollout</span><span class="badge orange">In Progress</span></div>
+              <div style="font-size:0.78rem;color:var(--muted);margin-bottom:10px">Bug fixes + Bhashini offline pack + improved YOLO model</div>
+              <div style="height:6px;background:var(--glass-border-hi);border-radius:999px;overflow:hidden;margin-bottom:8px"><div style="height:100%;width:34%;background:var(--orange);border-radius:999px"></div></div>
+              <div style="display:flex;justify-content:space-between;font-size:0.72rem;color:var(--muted);font-family:'JetBrains Mono',monospace"><span>623 / 1,807 updated</span><span>34%</span></div>
+            </div>
+            <div style="padding:16px;background:rgba(46,125,50,0.05);border:0.5px solid rgba(46,125,50,0.15);border-radius:16px">
+              <div style="display:flex;justify-content:space-between;margin-bottom:10px"><span style="font-weight:600;font-size:0.9rem">v2.0.8 → v2.1.3 (legacy)</span><span class="badge green">Completed</span></div>
+              <div style="font-size:0.78rem;color:var(--muted)">Security patch + GPS fix</div>
+              <div style="margin-top:8px;font-size:0.72rem;color:var(--muted);font-family:'JetBrains Mono',monospace">77 / 77 remaining · Started 3d ago</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ ANALYTICS PAGE ============ -->
+    <div class="page" id="page-analytics">
+      <div class="topbar">
+        <div><h1>Analytics</h1><div class="subtitle">Growth, usage, and engagement insights</div></div>
+        <div class="topbar-actions">
+          <select class="form-select" style="width:auto;padding:8px 16px"><option>Last 30 days</option><option>Last 7 days</option><option>Last 90 days</option></select>
+          <button class="btn btn-ghost">Export Report</button>
+        </div>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-icon orange"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></div><div class="stat-value">923</div><div class="stat-label">Blind Users</div><div class="stat-trend up">↑ 12% MoM</div></div>
+        <div class="stat-card"><div class="stat-icon blue"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div><div class="stat-value">2,847</div><div class="stat-label">Total Users</div><div class="stat-trend up">↑ 18% MoM</div></div>
+        <div class="stat-card"><div class="stat-icon green"><svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div><div class="stat-value">7.2h</div><div class="stat-label">Avg Daily Usage</div><div class="stat-trend up">↑ 0.4h</div></div>
+        <div class="stat-card"><div class="stat-icon purple"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><div class="stat-value">48k</div><div class="stat-label">AI Queries (30d)</div><div class="stat-trend up">↑ 23%</div></div>
+      </div>
+      <div class="grid-2">
+        <div class="panel">
+          <div class="panel-header"><div><div class="panel-title">User Growth</div><div class="panel-sub">New signups per week</div></div></div>
+          <div id="growthChart" style="height:160px;display:flex;align-items:flex-end;gap:6px;padding:0 8px"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-header"><div><div class="panel-title">Top AI Features Used</div></div></div>
+          <div style="padding:8px 0">
+            <div style="margin-bottom:14px"><div style="display:flex;justify-content:space-between;margin-bottom:5px"><span style="font-size:0.85rem">Object Detection</span><span style="font-size:0.78rem;font-family:'JetBrains Mono',monospace;color:var(--orange)">18.2k</span></div><div style="height:5px;background:var(--glass-border-hi);border-radius:999px;overflow:hidden"><div style="height:100%;width:88%;background:var(--orange);border-radius:999px"></div></div></div>
+            <div style="margin-bottom:14px"><div style="display:flex;justify-content:space-between;margin-bottom:5px"><span style="font-size:0.85rem">OCR Reading</span><span style="font-size:0.78rem;font-family:'JetBrains Mono',monospace;color:var(--orange-bright)">12.7k</span></div><div style="height:5px;background:var(--glass-border-hi);border-radius:999px;overflow:hidden"><div style="height:100%;width:62%;background:var(--orange-bright);border-radius:999px"></div></div></div>
+            <div style="margin-bottom:14px"><div style="display:flex;justify-content:space-between;margin-bottom:5px"><span style="font-size:0.85rem">Currency ID</span><span style="font-size:0.78rem;font-family:'JetBrains Mono',monospace;color:var(--yellow)">6.4k</span></div><div style="height:5px;background:var(--glass-border-hi);border-radius:999px;overflow:hidden"><div style="height:100%;width:31%;background:var(--yellow);border-radius:999px"></div></div></div>
+            <div style="margin-bottom:14px"><div style="display:flex;justify-content:space-between;margin-bottom:5px"><span style="font-size:0.85rem">Face Recognition</span><span style="font-size:0.78rem;font-family:'JetBrains Mono',monospace;color:#42A5F5">4.1k</span></div><div style="height:5px;background:var(--glass-border-hi);border-radius:999px;overflow:hidden"><div style="height:100%;width:20%;background:#42A5F5;border-radius:999px"></div></div></div>
+            <div><div style="display:flex;justify-content:space-between;margin-bottom:5px"><span style="font-size:0.85rem">Navigation</span><span style="font-size:0.78rem;font-family:'JetBrains Mono',monospace;color:#AB47BC">3.8k</span></div><div style="height:5px;background:var(--glass-border-hi);border-radius:999px;overflow:hidden"><div style="height:100%;width:18%;background:#AB47BC;border-radius:999px"></div></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-header"><div><div class="panel-title">Geographic Distribution</div><div class="panel-sub">Users by state</div></div></div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:8px 0" id="geoGrid"></div>
+      </div>
+    </div>
+
+    <!-- ============ SETTINGS PAGE ============ -->
+    <div class="page" id="page-settings">
+      <div class="topbar">
+        <div><h1>Settings</h1><div class="subtitle">Admin configuration and feature flags</div></div>
+      </div>
+      <div class="grid-2">
+        <div class="panel">
+          <div class="panel-header"><div><div class="panel-title">Feature Flags</div><div class="panel-sub">Toggle features globally</div></div></div>
+          <div class="toggle-row"><div><div style="font-size:0.88rem">Consent-Based Privacy</div><div style="font-size:0.75rem;color:var(--muted)">Require blind user consent before family video access</div></div><div class="toggle on"></div></div>
+          <div class="toggle-row"><div><div style="font-size:0.88rem">Echo Network</div><div style="font-size:0.75rem;color:var(--muted)">Enable volunteer helper system</div></div><div class="toggle on"></div></div>
+          <div class="toggle-row"><div><div style="font-size:0.88rem">OmniAccess</div><div style="font-size:0.75rem;color:var(--muted)">Allow device control (phone/laptop)</div></div><div class="toggle on"></div></div>
+          <div class="toggle-row"><div><div style="font-size:0.88rem">Companion AI</div><div style="font-size:0.75rem;color:var(--muted)">Emotional wellness monitoring</div></div><div class="toggle on"></div></div>
+          <div class="toggle-row"><div><div style="font-size:0.88rem">MediScan</div><div style="font-size:0.75rem;color:var(--muted)">Drug interaction checker (beta)</div></div><div class="toggle"></div></div>
+          <div class="toggle-row"><div><div style="font-size:0.88rem">New Registrations</div><div style="font-size:0.75rem;color:var(--muted)">Allow new users to sign up</div></div><div class="toggle on"></div></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:20px">
+          <div class="panel">
+            <div class="panel-header"><div><div class="panel-title">System Configuration</div></div></div>
+            <div class="form-group"><label class="form-label">Default Language</label><select class="form-select"><option>Hindi</option><option>Tamil</option><option>Telugu</option><option>English</option></select></div>
+            <div class="form-group"><label class="form-label">SOS Auto-Access Duration (minutes)</label><input class="form-input" type="number" value="60"></div>
+            <div class="form-group"><label class="form-label">Consent Request Timeout (seconds)</label><input class="form-input" type="number" value="30"></div>
+            <div class="form-group"><label class="form-label">Max Family Members Per Tree</label><input class="form-input" type="number" value="12"></div>
+          </div>
+          <div class="panel">
+            <div class="panel-header"><div><div class="panel-title">Danger Zone</div></div></div>
+            <div class="toggle-row"><div><div style="font-size:0.88rem;color:var(--red-bright)">Maintenance Mode</div><div style="font-size:0.75rem;color:var(--muted)">Blocks all non-admin access</div></div><div class="toggle"></div></div>
+            <div style="margin-top:16px;display:flex;gap:12px"><button class="btn btn-ghost btn-sm" style="border-color:var(--red-bright);color:var(--red-bright)">Clear All Cache</button><button class="btn btn-ghost btn-sm" style="border-color:var(--red-bright);color:var(--red-bright)">Export All Data</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
 
   </main>
 </div>
@@ -604,23 +866,44 @@ tr:hover td{background:rgba(255,255,255,0.02)}
     <button class="modal-close" onclick="closeModal('broadcast')"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     <h2>Broadcast Alert</h2>
     <p>Send a message to all ARGES users or a filtered group.</p>
-    <div class="form-group">
-      <label class="form-label">Send To</label>
-      <select class="form-select"><option>All Users (2,847)</option><option>Blind Users Only (923)</option><option>Family Members (1,438)</option><option>Helpers (486)</option><option>Specific Region</option></select>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Priority</label>
-      <select class="form-select"><option>Normal</option><option>High</option><option>Critical</option></select>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Message</label>
-      <input class="form-input" placeholder="Type your broadcast message...">
-    </div>
+    <div class="form-group"><label class="form-label">Send To</label><select class="form-select"><option>All Users (2,847)</option><option>Blind Users Only (923)</option><option>Family Members (1,438)</option><option>Helpers (486)</option><option>Specific Region</option></select></div>
+    <div class="form-group"><label class="form-label">Priority</label><select class="form-select"><option>Normal</option><option>High</option><option>Critical</option></select></div>
+    <div class="form-group"><label class="form-label">Message</label><input class="form-input" placeholder="Type your broadcast message..."></div>
     <div class="toggle-row"><div><div style="font-size:0.88rem">Read aloud to blind users</div><div style="font-size:0.75rem;color:var(--muted)">ARGES will speak this message</div></div><div class="toggle on"></div></div>
-    <div class="modal-actions">
-      <button class="btn btn-ghost" onclick="closeModal('broadcast')">Cancel</button>
-      <button class="btn" onclick="closeModal('broadcast')">Send Broadcast</button>
+    <div class="modal-actions"><button class="btn btn-ghost" onclick="closeModal('broadcast')">Cancel</button><button class="btn" onclick="closeModal('broadcast')">Send Broadcast</button></div>
+  </div>
+</div>
+
+<!-- ============ OTA PUSH MODAL ============ -->
+<div class="modal-overlay" id="modal-otaPush">
+  <div class="modal" style="position:relative">
+    <button class="modal-close" onclick="closeModal('otaPush')"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    <h2>Push OTA Update</h2>
+    <p>Deploy a firmware update to ARGES devices.</p>
+    <div class="form-group"><label class="form-label">Target Version</label><input class="form-input" placeholder="e.g. v2.2.0" value="v2.2.0"></div>
+    <div class="form-group"><label class="form-label">Release Notes</label><textarea class="form-input" rows="3" placeholder="What changed?" style="resize:vertical">Bug fixes + Bhashini offline pack + improved YOLO model</textarea></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Rollout %</label><select class="form-select"><option>10% (canary)</option><option>25%</option><option>50%</option><option selected>100% (all)</option></select></div>
+      <div class="form-group"><label class="form-label">Target Group</label><select class="form-select"><option>All Devices</option><option>Specific Firmware Only</option><option>By Region</option><option>Beta Testers</option></select></div>
     </div>
+    <div class="toggle-row"><div><div style="font-size:0.88rem">Force update (interrupts user)</div><div style="font-size:0.75rem;color:var(--muted)">Otherwise installs when idle</div></div><div class="toggle"></div></div>
+    <div class="modal-actions"><button class="btn btn-ghost" onclick="closeModal('otaPush')">Cancel</button><button class="btn" onclick="closeModal('otaPush')">Start Rollout</button></div>
+  </div>
+</div>
+
+<!-- ============ ADD FAMILY MODAL ============ -->
+<div class="modal-overlay" id="modal-addFamily">
+  <div class="modal" style="position:relative">
+    <button class="modal-close" onclick="closeModal('addFamily')"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    <h2>Create Family Tree</h2>
+    <p>Set up a new family for a blind user. Members are added after creation.</p>
+    <div class="form-group"><label class="form-label">Blind User</label><select class="form-select"><option>Ravi Kumar</option><option>Priya Devi</option><option>New User...</option></select></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Primary Contact Name</label><input class="form-input" placeholder="e.g. Lakshmi Ammal"></div>
+      <div class="form-group"><label class="form-label">Relation</label><select class="form-select"><option>Mother</option><option>Father</option><option>Spouse</option><option>Guardian</option></select></div>
+    </div>
+    <div class="form-group"><label class="form-label">Contact Email</label><input class="form-input" type="email" placeholder="family@email.com"></div>
+    <div class="modal-actions"><button class="btn btn-ghost" onclick="closeModal('addFamily')">Cancel</button><button class="btn" onclick="closeModal('addFamily')">Create Family</button></div>
   </div>
 </div>
 
@@ -683,6 +966,138 @@ if(tbody){
     <td style="font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--muted)">${u.la}</td>
     <td><button class="action-btn"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button><button class="action-btn danger"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button></td>
   </tr>`).join('');
+}
+
+// ============ DEVICES GRID ============
+const mockDevices=[
+  {id:'ARGES-0014',user:'Ravi Kumar',fw:'v2.1.3',s:'online',bat:87,temp:'38°C',up:'2h'},
+  {id:'ARGES-0089',user:'Priya Devi',fw:'v2.1.3',s:'updating',bat:42,temp:'41°C',up:'6h'},
+  {id:'ARGES-0234',user:'Mohammed Irfan',fw:'v2.0.8',s:'offline',bat:'—',temp:'—',up:'2d'},
+  {id:'ARGES-0512',user:'Anjali Rao',fw:'v2.1.3',s:'online',bat:94,temp:'35°C',up:'8h'},
+  {id:'ARGES-0678',user:'Sneha Reddy',fw:'v2.1.3',s:'online',bat:71,temp:'39°C',up:'4h'},
+  {id:'ARGES-0734',user:'Arjun Nair',fw:'v2.0.8',s:'online',bat:23,temp:'43°C',up:'1h'},
+  {id:'ARGES-0891',user:'Meena Krishnan',fw:'v2.1.3',s:'online',bat:88,temp:'36°C',up:'5h'},
+  {id:'ARGES-0945',user:'Vijay Kumar',fw:'v2.1.3',s:'updating',bat:55,temp:'40°C',up:'3h'},
+];
+const devStatusColors={online:'green',offline:'red',updating:'yellow'};
+const dgrid=document.getElementById('devicesGrid');
+if(dgrid){
+  dgrid.innerHTML=mockDevices.map(d=>`<div class="device-card">
+    <div class="device-header"><div><div class="device-name">${d.id}</div><div class="device-user">${d.user} · ${d.fw}</div></div><span class="badge ${devStatusColors[d.s]}"><span class="dot"></span>${d.s.charAt(0).toUpperCase()+d.s.slice(1)}</span></div>
+    <div class="device-stats"><div class="device-stat"><div class="v">${d.bat}</div><div class="l">Battery</div></div><div class="device-stat"><div class="v">${d.temp}</div><div class="l">Temp</div></div><div class="device-stat"><div class="v">${d.up}</div><div class="l">${d.s==='offline'?'Last seen':'Uptime'}</div></div></div>
+  </div>`).join('');
+}
+
+// ============ FAMILIES TABLE ============
+const mockFamilies=[
+  {blind:'Ravi Kumar',members:5,relations:'Mother, Father, Brother, Sister',created:'Aug 2026'},
+  {blind:'Priya Devi',members:3,relations:'Uncle, Aunt',created:'Jul 2026'},
+  {blind:'Anjali Rao',members:4,relations:'Father, Mother, Cousin',created:'Jul 2026'},
+  {blind:'Mohammed Irfan',members:2,relations:'Spouse',created:'Jun 2026'},
+  {blind:'Sneha Reddy',members:6,relations:'Father, Mother, 2 Brothers, Sister',created:'Jun 2026'},
+];
+const ftbody=document.getElementById('familiesTableBody');
+if(ftbody){
+  ftbody.innerHTML=mockFamilies.map(f=>`<tr>
+    <td><div class="user-cell"><div class="user-avatar blind">${f.blind.split(' ').map(x=>x[0]).join('').slice(0,2)}</div><div class="user-name">${f.blind}</div></div></td>
+    <td><span class="badge orange">${f.members}</span></td>
+    <td style="font-size:0.82rem;color:var(--muted)">${f.relations}</td>
+    <td style="font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--muted)">${f.created}</td>
+  </tr>`).join('');
+}
+
+// ============ HELPERS LEADERBOARD ============
+const mockHelpers=[
+  {rank:1,n:'Vikram Singh',loc:'Pune, MH',sessions:284,rating:4.9,s:'active',badges:3},
+  {rank:2,n:'Deepa Nair',loc:'Kochi, KL',sessions:231,rating:4.8,s:'active',badges:3},
+  {rank:3,n:'Rahul Mehta',loc:'Mumbai, MH',sessions:198,rating:4.9,s:'active',badges:2},
+  {rank:4,n:'Saritha Joshi',loc:'Bengaluru, KA',sessions:167,rating:4.7,s:'active',badges:2},
+  {rank:5,n:'Arjun Pillai',loc:'Thiruvananthapuram, KL',sessions:142,rating:4.8,s:'active',badges:1},
+  {rank:6,n:'Fatima Sheikh',loc:'Hyderabad, TS',sessions:128,rating:5.0,s:'active',badges:3},
+  {rank:7,n:'Manoj Verma',loc:'Delhi, DL',sessions:89,rating:4.6,s:'pending',badges:0},
+];
+const hStatusColors={active:'green',pending:'yellow'};
+const htbody=document.getElementById('helpersTableBody');
+if(htbody){
+  htbody.innerHTML=mockHelpers.map(h=>`<tr>
+    <td style="font-family:'JetBrains Mono',monospace;font-weight:600;color:${h.rank<=3?'var(--orange)':'var(--muted)'}">#${h.rank}</td>
+    <td><div class="user-cell"><div class="user-avatar helper">${h.n.split(' ').map(x=>x[0]).join('').slice(0,2)}</div><div class="user-name">${h.n}</div></div></td>
+    <td style="font-size:0.82rem;color:var(--muted)">${h.loc}</td>
+    <td><span style="font-family:'JetBrains Mono',monospace;font-weight:600">${h.sessions}</span></td>
+    <td><span style="color:var(--yellow)">★</span> <span style="font-family:'JetBrains Mono',monospace">${h.rating}</span></td>
+    <td><span class="badge ${hStatusColors[h.s]}"><span class="dot"></span>${h.s.charAt(0).toUpperCase()+h.s.slice(1)}</span></td>
+    <td>${h.badges>0?'<span style="color:var(--orange)">★</span> ×'+h.badges:'—'}</td>
+  </tr>`).join('');
+}
+
+// ============ ALERTS TABLE ============
+const mockAlerts=[
+  {type:'SOS',icon:'siren',user:'Priya Devi',loc:'Coimbatore, TN',time:'12m ago',status:'unresolved'},
+  {type:'Fall',icon:'alert',user:'Arjun Nair',loc:'Kochi, KL',time:'28m ago',status:'resolved'},
+  {type:'Hazard',icon:'flame',user:'Ravi Kumar',loc:'Coimbatore, TN',time:'1h ago',status:'resolved'},
+  {type:'SOS',icon:'siren',user:'Sneha Reddy',loc:'Hyderabad, TS',time:'2h ago',status:'resolved'},
+  {type:'Fall',icon:'alert',user:'Vijay Kumar',loc:'Chennai, TN',time:'3h ago',status:'resolved'},
+  {type:'Stranger',icon:'eye',user:'Meena Krishnan',loc:'Madurai, TN',time:'5h ago',status:'unresolved'},
+  {type:'SOS',icon:'siren',user:'Mohammed Irfan',loc:'Hyderabad, TS',time:'6h ago',status:'resolved'},
+];
+const aTypeColors={SOS:'red',Fall:'yellow',Hazard:'orange',Stranger:'purple'};
+const aStatusColors={resolved:'green',unresolved:'red'};
+const atbody=document.getElementById('alertsTableBody');
+if(atbody){
+  atbody.innerHTML=mockAlerts.map(a=>`<tr>
+    <td><span class="badge ${aTypeColors[a.type]||'gray'}">${a.type}</span></td>
+    <td><div class="user-cell"><div class="user-avatar blind" style="width:28px;height:28px;font-size:0.7rem">${a.user.split(' ').map(x=>x[0]).join('').slice(0,2)}</div><div class="user-name" style="font-size:0.85rem">${a.user}</div></div></td>
+    <td style="font-size:0.82rem;color:var(--muted)">${a.loc}</td>
+    <td style="font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--muted)">${a.time}</td>
+    <td><span class="badge ${aStatusColors[a.status]}"><span class="dot"></span>${a.status.charAt(0).toUpperCase()+a.status.slice(1)}</span></td>
+    <td><button class="action-btn"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button></td>
+  </tr>`).join('');
+}
+
+// ============ API CHART (bar chart, CSS only) ============
+const apiChart=document.getElementById('apiChart');
+if(apiChart){
+  const data=[45,38,52,41,36,48,42,55,47,38,33,42,50,44,39,41,48,52,46,40,35,42,38,34];
+  const max=Math.max(...data);
+  apiChart.innerHTML=data.map((v,i)=>{
+    const h=(v/max*100);
+    const color=v>50?'var(--yellow)':v>45?'var(--orange-bright)':'var(--green-bright)';
+    return `<div style="flex:1;height:${h}%;background:${color};border-radius:3px 3px 0 0;opacity:0.85;transition:opacity .25s" title="${v}ms"></div>`;
+  }).join('');
+}
+
+// ============ GROWTH CHART (bar chart) ============
+const growthChart=document.getElementById('growthChart');
+if(growthChart){
+  const data=[12,18,15,22,28,25,34,31,42,38,47,52];
+  const max=Math.max(...data);
+  growthChart.innerHTML=data.map((v,i)=>{
+    const h=(v/max*100);
+    return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px">
+      <div style="font-size:0.6rem;font-family:'JetBrains Mono',monospace;color:var(--muted)">${v}</div>
+      <div style="width:100%;height:${h}%;background:linear-gradient(to top,var(--orange),var(--orange-bright));border-radius:4px 4px 0 0;opacity:0.9;min-height:4px"></div>
+    </div>`;
+  }).join('');
+}
+
+// ============ GEO DISTRIBUTION ============
+const mockGeo=[
+  {state:'Tamil Nadu',users:284,pct:31},
+  {state:'Karnataka',users:198,pct:21},
+  {state:'Kerala',users:147,pct:16},
+  {state:'Maharashtra',users:112,pct:12},
+  {state:'Telangana',users:89,pct:10},
+  {state:'Delhi',users:54,pct:6},
+  {state:'Others',users:39,pct:4},
+];
+const geoGrid=document.getElementById('geoGrid');
+if(geoGrid){
+  geoGrid.innerHTML=mockGeo.map(g=>`<div style="padding:14px;background:rgba(255,255,255,0.02);border:0.5px solid var(--glass-border);border-radius:12px">
+    <div style="font-size:0.8rem;font-weight:600;margin-bottom:4px">${g.state}</div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:1.1rem;color:var(--orange);font-weight:700">${g.users}</div>
+    <div style="height:4px;background:var(--glass-border-hi);border-radius:999px;overflow:hidden;margin-top:8px"><div style="height:100%;width:${g.pct*3}%;background:var(--orange);border-radius:999px"></div></div>
+    <div style="font-size:0.66rem;color:var(--muted);margin-top:4px">${g.pct}% of total</div>
+  </div>`).join('');
 }
 </script>
 </body>
