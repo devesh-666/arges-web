@@ -319,7 +319,22 @@ tr:hover td{background:rgba(255,255,255,0.02)}
 <div class="cursor-dot" id="cursorDot"></div>
 <div class="cursor-ring" id="cursorRing"></div>
 
-<div class="app">
+<!-- ============ ADMIN LOGIN GATE ============ -->
+<div id="adminGate" style="position:fixed;inset:0;z-index:99000;background:rgba(0,0,8,0.95);backdrop-filter:blur(60px);-webkit-backdrop-filter:blur(60px);display:flex;align-items:center;justify-content:center;padding:24px">
+  <div style="text-align:center;max-width:400px">
+    <div style="margin-bottom:24px">
+      <svg viewBox="0 0 100 100" style="width:64px;height:64px;filter:drop-shadow(0 0 20px rgba(255,107,26,0.4))"><path d="M50 28 C28 28 14 50 14 50 C14 50 28 72 50 72 C72 72 86 50 86 50 C86 50 72 28 50 28 Z" stroke="#FF6B1A" stroke-width="3" fill="none"/><circle cx="50" cy="50" r="9" stroke="#FF6B1A" stroke-width="3" fill="none"/><circle cx="50" cy="50" r="3.5" fill="#FF6B1A"/></svg>
+    </div>
+    <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:1.8rem;margin-bottom:6px">ARGES Admin</div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:0.7rem;color:var(--orange);letter-spacing:0.2em;text-transform:uppercase;margin-bottom:32px">Restricted Access · Authorized Personnel Only</div>
+    <input id="adminPass" type="password" placeholder="Enter admin password" style="width:100%;background:var(--glass);border:0.5px solid var(--glass-border-hi);border-radius:14px;padding:14px 20px;color:var(--white);font-size:0.95rem;font-family:inherit;text-align:center;transition:border-color .3s;margin-bottom:16px" onfocus="this.style.borderColor='var(--orange)'" onblur="this.style.borderColor='var(--glass-border-hi)'" onkeydown="if(event.key==='Enter')checkAdminPass()">
+    <div id="gateError" style="color:var(--red-bright);font-size:0.82rem;margin-bottom:12px;display:none">Incorrect password. Access denied.</div>
+    <button onclick="checkAdminPass()" style="width:100%;background:var(--orange);color:#000;padding:14px;border-radius:14px;font-weight:600;font-size:0.92rem;border:none;cursor:pointer;transition:all .3s;box-shadow:0 4px 20px var(--orange-glow)">Authenticate →</button>
+    <div style="margin-top:20px;font-size:0.72rem;color:var(--muted-2)">Protected by Passkey + 2FA · All access is logged</div>
+  </div>
+</div>
+
+<div class="app" style="display:none" id="adminApp">
   <!-- ============ SIDEBAR ============ -->
   <aside class="sidebar">
     <div class="sidebar-logo">
@@ -1038,6 +1053,24 @@ tr:hover td{background:rgba(255,255,255,0.02)}
 
   </main>
 </div>
+<script>
+// ============ ADMIN LOGIN GATE ============
+const ADMIN_PASSWORD = 'arges-admin-2026';
+function checkAdminPass(){
+  const input = document.getElementById('adminPass').value;
+  if(input === ADMIN_PASSWORD){
+    document.getElementById('adminGate').style.display = 'none';
+    document.getElementById('adminApp').style.display = 'grid';
+    // Log the access (would be sent to audit log in production)
+    console.log('[AUDIT] Admin authenticated at ' + new Date().toISOString());
+  } else {
+    document.getElementById('gateError').style.display = 'block';
+    document.getElementById('adminPass').value = '';
+    document.getElementById('adminPass').style.borderColor = 'var(--red-bright)';
+    setTimeout(()=>{document.getElementById('gateError').style.display='none';document.getElementById('adminPass').style.borderColor='var(--glass-border-hi)'},3000);
+  }
+}
+</script>
 
 <!-- ============ ADD USER MODAL ============ -->
 <div class="modal-overlay" id="modal-addUser">

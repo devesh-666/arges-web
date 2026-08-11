@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ARGES — Create Family Account</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=Hanken+Grotesk:wght@300;400;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#000008; --glass:rgba(255,255,255,0.05); --glass-hi:rgba(255,255,255,0.09);
+  --glass-border:rgba(255,255,255,0.10); --glass-border-hi:rgba(255,255,255,0.18);
+  --orange:#FF6B1A; --orange-bright:#FF8533; --orange-glow:rgba(255,107,26,0.4);
+  --white:#fff; --muted:#8B8B9A; --muted-2:#555566;
+  --green:#2E7D32; --green-bright:#4CAF50; --red:#D32F2F; --red-bright:#EF5350; --purple:#7B1FA2;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--white);font-family:'Hanken Grotesk',sans-serif;overflow-x:hidden;min-height:100vh;
+  background-image:radial-gradient(ellipse 60% 50% at 50% 0%,rgba(255,107,26,0.10),transparent),radial-gradient(ellipse 50% 40% at 20% 80%,rgba(80,40,200,0.05),transparent);background-attachment:fixed}
+::selection{background:var(--orange);color:#000}
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--glass-border-hi);border-radius:3px}
+
+/* Progress indicator */
+.progress-bar{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--orange),var(--orange-bright));z-index:100;transition:width .6s cubic-bezier(0.16,1,0.3,1);box-shadow:0 0 12px var(--orange-glow)}
+
+/* Steps indicator */
+.steps{display:flex;justify-content:center;gap:0;margin-bottom:40px}
+.step-dot{display:flex;flex-direction:column;align-items:center;gap:8px;flex:1;max-width:140px;position:relative}
+.step-dot:not(:last-child)::after{content:'';position:absolute;top:16px;right:-50%;width:100%;height:2px;background:var(--glass-border);z-index:0}
+.step-dot.done:not(:last-child)::after{background:var(--orange)}
+.step-circle{width:36px;height:36px;border-radius:50%;border:2px solid var(--glass-border-hi);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.85rem;z-index:1;transition:all .4s;color:var(--muted)}
+.step-dot.active .step-circle{border-color:var(--orange);color:var(--orange);box-shadow:0 0 16px var(--orange-glow)}
+.step-dot.done .step-circle{background:var(--orange);border-color:var(--orange);color:#000}
+.step-label{font-size:0.7rem;color:var(--muted);text-align:center;transition:color .3s}
+.step-dot.active .step-label{color:var(--white)}
+
+/* Card */
+.card{max-width:520px;margin:0 auto;padding:48px 40px;border-radius:32px;background:var(--glass);backdrop-filter:blur(40px) saturate(1.5);-webkit-backdrop-filter:blur(40px) saturate(1.5);border:0.5px solid var(--glass-border-hi);box-shadow:0 24px 70px rgba(0,0,0,0.6),inset 0 1px 0 rgba(255,255,255,0.1);position:relative;overflow:hidden}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:40%;background:linear-gradient(180deg,rgba(255,255,255,0.04),transparent);pointer-events:none}
+
+.page{display:none}.page.active{display:block;animation:fadeUp .5s cubic-bezier(0.16,1,0.3,1)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+.logo{text-align:center;margin-bottom:32px}
+.logo svg{width:48px;height:48px;filter:drop-shadow(0 0 12px var(--orange-glow))}
+.logo h1{font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:1.5rem;margin-top:8px}
+.logo .sub{font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:var(--orange);letter-spacing:0.2em;text-transform:uppercase;margin-top:4px}
+
+h2{font-family:'Bricolage Grotesque',sans-serif;font-weight:600;font-size:1.4rem;margin-bottom:8px}
+.desc{font-size:0.88rem;color:var(--muted);margin-bottom:28px;line-height:1.5}
+
+.form-group{margin-bottom:18px}
+.form-label{font-family:'JetBrains Mono',monospace;font-size:0.68rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--orange);margin-bottom:8px;display:block}
+.form-input,.form-select{width:100%;background:var(--glass);border:0.5px solid var(--glass-border);border-radius:12px;padding:14px 16px;color:var(--white);font-size:0.9rem;font-family:inherit;transition:border-color .3s}
+.form-input:focus,.form-select:focus{outline:none;border-color:var(--orange)}
+.form-input::placeholder{color:var(--muted-2)}
+.form-select{appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='none' stroke='%238B8B9A' stroke-width='2' viewBox='0 0 24 24'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:40px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+.btn{background:var(--orange);color:#000;padding:14px;border-radius:12px;font-weight:600;font-size:0.9rem;border:none;width:100%;transition:all .3s;box-shadow:0 4px 20px var(--orange-glow);display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.btn:hover{transform:translateY(-2px);box-shadow:0 8px 28px var(--orange-glow)}
+.btn-ghost{background:var(--glass);color:var(--white);border:0.5px solid var(--glass-border-hi);box-shadow:none}
+.btn-ghost:hover{background:var(--glass-hi)}
+
+.relation-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}
+.relation-card{padding:14px;border-radius:12px;background:var(--glass);border:0.5px solid var(--glass-border);text-align:center;cursor:pointer;transition:all .3s;font-size:0.8rem}
+.relation-card:hover{border-color:var(--glass-border-hi);background:var(--glass-hi)}
+.relation-card.selected{border-color:var(--orange);background:rgba(255,107,26,0.06);color:var(--orange)}
+.relation-card .icon{font-size:1.3rem;margin-bottom:6px;display:block}
+
+/* Passkey/verify display */
+.verify-display{text-align:center;padding:20px 0}
+.verify-icon{width:100px;height:100px;border-radius:50%;margin:0 auto 20px;background:radial-gradient(circle,rgba(255,107,26,0.15),rgba(255,107,26,0.03));border:2px solid rgba(255,107,26,0.2);display:flex;align-items:center;justify-content:center;position:relative;transition:all .5s}
+.verify-icon svg{width:48px;height:48px;stroke:var(--orange);fill:none;stroke-width:1.5}
+.verify-icon.success{background:radial-gradient(circle,rgba(46,125,50,0.15),rgba(46,125,50,0.03));border-color:rgba(46,125,50,0.3)}
+.verify-icon.success svg{stroke:var(--green-bright)}
+.verify-icon::after{content:'';position:absolute;inset:-4px;border-radius:50%;border:1px dashed rgba(255,107,26,0.2);animation:spin 3s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.info-box{padding:14px;border-radius:12px;background:rgba(255,107,26,0.04);border:0.5px solid rgba(255,107,26,0.12);font-size:0.82rem;color:var(--muted);margin-bottom:20px;line-height:1.5}
+.info-box strong{color:var(--orange-bright)}
+
+.toggle{width:40px;height:22px;background:var(--glass-border-hi);border-radius:999px;position:relative;cursor:pointer;transition:background .3s;flex-shrink:0}
+.toggle::after{content:'';position:absolute;top:2px;left:2px;width:18px;height:18px;background:var(--white);border-radius:50%;transition:transform .3s}
+.toggle.on{background:var(--orange)}
+.toggle.on::after{transform:translateX(18px)}
+
+.completed{text-align:center;padding:40px 0}
+.completed svg{width:80px;height:80px;stroke:var(--green-bright);fill:none;stroke-width:1.5;margin-bottom:20px;filter:drop-shadow(0 0 20px rgba(76,175,80,0.3))}
+
+footer{text-align:center;padding:32px;font-size:0.75rem;color:var(--muted-2)}
+footer a{color:var(--orange)}
+</style>
+</head>
+<body>
+
+<div class="progress-bar" id="progressBar" style="width:25%"></div>
+
+<div style="padding:60px 24px 40px">
+  <!-- Steps indicator -->
+  <div class="steps">
+    <div class="step-dot active" id="sd1"><div class="step-circle">1</div><div class="step-label">Account</div></div>
+    <div class="step-dot" id="sd2"><div class="step-circle">2</div><div class="step-label">Verify Device</div></div>
+    <div class="step-dot" id="sd3"><div class="step-circle">3</div><div class="step-label">Blind User</div></div>
+    <div class="step-dot" id="sd4"><div class="step-circle">4</div><div class="step-label">Done</div></div>
+  </div>
+
+  <div class="card">
+    <div class="logo">
+      <svg viewBox="0 0 100 100"><path d="M50 28 C28 28 14 50 14 50 C14 50 28 72 50 72 C72 72 86 50 86 50 C86 50 72 28 50 28 Z" stroke="#FF6B1A" stroke-width="3" fill="none"/><circle cx="50" cy="50" r="9" stroke="#FF6B1A" stroke-width="3" fill="none"/><circle cx="50" cy="50" r="3.5" fill="#FF6B1A"/></svg>
+      <h1>ARGES</h1>
+      <div class="sub">Create Family Account</div>
+    </div>
+
+    <!-- ============ STEP 1: ACCOUNT DETAILS ============ -->
+    <div class="page active" id="page1">
+      <h2>Create your account</h2>
+      <p class="desc">You'll be the <strong style="color:var(--orange-bright)">Family Head</strong> — you manage the family tree, add members, and control device access.</p>
+
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Full Name</label><input class="form-input" placeholder="e.g. Lakshmi Ammal"></div>
+        <div class="form-group"><label class="form-label">Phone</label><input class="form-input" placeholder="+91 ..."></div>
+      </div>
+      <div class="form-group"><label class="form-label">Email Address</label><input class="form-input" type="email" placeholder="you@email.com"></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Your Relation to Blind User</label>
+          <select class="form-select"><option>Mother</option><option>Father</option><option>Spouse</option><option>Sibling</option><option>Child</option><option>Guardian</option><option>Grandparent</option><option>Other</option></select>
+        </div>
+        <div class="form-group"><label class="form-label">Preferred Language</label>
+          <select class="form-select"><option>English</option><option>हिन्दी (Hindi)</option><option>தமிழ் (Tamil)</option><option>తెలుగు (Telugu)</option><option>मराठी (Marathi)</option><option>বাংলা (Bengali)</option><option>ಕನ್ನಡ (Kannada)</option></select>
+        </div>
+      </div>
+      <button class="btn" onclick="goStep(2)">Continue →</button>
+    </div>
+
+    <!-- ============ STEP 2: DEVICE VERIFICATION ============ -->
+    <div class="page" id="page2">
+      <h2>Verify your device</h2>
+      <p class="desc">Secure your account with a passkey. Your phone or computer's fingerprint/Face ID becomes your login — no passwords needed.</p>
+
+      <div class="verify-display">
+        <div class="verify-icon" id="verifyIcon">
+          <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
+        </div>
+        <div id="verifyStatus" style="font-size:0.88rem;color:var(--muted);margin-bottom:20px">Click below to register your device</div>
+      </div>
+
+      <div class="info-box">
+        <strong>What is a passkey?</strong><br>
+        A passkey uses your device's biometric (fingerprint/Face ID) or screen lock to sign in. It's more secure than a password and can't be phished. Your biometric data never leaves your device.
+      </div>
+
+      <button class="btn" id="verifyBtn" onclick="startVerify()" style="margin-bottom:12px">Register Passkey</button>
+      <button class="btn btn-ghost" onclick="goStep(3)" id="skipVerify" style="display:none">Continue →</button>
+      <button class="btn btn-ghost" onclick="goStep(1)" style="font-size:0.82rem;padding:10px">← Back</button>
+    </div>
+
+    <!-- ============ STEP 3: BLIND USER SETUP ============ -->
+    <div class="page" id="page3">
+      <h2>Add the blind user</h2>
+      <p class="desc">Who will be wearing the ARGES glasses? You'll manage their device and can add more family members after setup.</p>
+
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Blind User's Name</label><input class="form-input" placeholder="e.g. Ravi Kumar"></div>
+        <div class="form-group"><label class="form-label">Age</label><input class="form-input" type="number" placeholder="e.g. 24"></div>
+      </div>
+      <div class="form-group"><label class="form-label">Their Phone (for setup assistance)</label><input class="form-input" placeholder="+91 ..."></div>
+
+      <div class="form-group">
+        <label class="form-label">Privacy Preferences</label>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:0.5px solid rgba(255,255,255,0.04)">
+          <div><div style="font-size:0.85rem">GPS always visible to family</div><div style="font-size:0.72rem;color:var(--muted)">Family can see location without asking</div></div>
+          <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:0.5px solid rgba(255,255,255,0.04)">
+          <div><div style="font-size:0.85rem">Video/audio requires consent</div><div style="font-size:0.72rem;color:var(--muted)">Blind user must accept each viewing request</div></div>
+          <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0">
+          <div><div style="font-size:0.85rem">Emergency auto-access</div><div style="font-size:0.72rem;color:var(--muted)">Family gets instant access on fall/SOS</div></div>
+          <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+        </div>
+      </div>
+
+      <button class="btn" onclick="goStep(4)">Create Family →</button>
+      <button class="btn btn-ghost" onclick="goStep(2)" style="font-size:0.82rem;padding:10px;margin-top:8px">← Back</button>
+    </div>
+
+    <!-- ============ STEP 4: COMPLETE ============ -->
+    <div class="page" id="page4">
+      <div class="completed">
+        <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        <h2 style="margin-bottom:6px">Family Created!</h2>
+        <p class="desc" style="margin-bottom:28px">Your family tree is set up. You're the Family Head with full management access.<br><br>Next steps:<br>1. Pair the ARGES glasses to the blind user's account<br>2. Add more family members (Father, Brother, Sister...)<br>3. Each member gets their own dashboard</p>
+        <a href="family.html"><button class="btn" style="margin-bottom:12px">Go to Family Dashboard →</button></a>
+        <a href="index.html"><button class="btn btn-ghost" style="font-size:0.82rem;padding:10px">Back to Home</button></a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<footer>© 2026 ARGES · Forging Light. Empowering Sight. · <a href="index.html">Home</a></footer>
+
+<script>
+let currentStep = 1;
+
+function goStep(n){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page'+n).classList.add('active');
+  currentStep = n;
+  // Update step dots
+  document.querySelectorAll('.step-dot').forEach((d,i)=>{
+    d.classList.remove('active','done');
+    if(i+1 < n) d.classList.add('done');
+    else if(i+1 === n) d.classList.add('active');
+  });
+  // Update progress bar
+  document.getElementById('progressBar').style.width = (n*25)+'%';
+}
+
+function startVerify(){
+  const btn = document.getElementById('verifyBtn');
+  const icon = document.getElementById('verifyIcon');
+  const status = document.getElementById('verifyStatus');
+  const skip = document.getElementById('skipVerify');
+
+  btn.textContent = 'Verifying...';
+  btn.disabled = true;
+  status.textContent = 'Waiting for biometric confirmation...';
+
+  // Simulate WebAuthn flow
+  setTimeout(()=>{
+    icon.classList.add('success');
+    icon.innerHTML = '<svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>';
+    status.innerHTML = '<span style="color:var(--green-bright);font-weight:600">✓ Device verified!</span><br>Your passkey is registered.';
+    btn.style.display = 'none';
+    skip.style.display = 'block';
+  }, 2000);
+}
+</script>
+</body>
+</html>
