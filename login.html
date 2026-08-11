@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ARGES — Login</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700&family=Hanken+Grotesk:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#000008;--glass:rgba(255,255,255,0.05);--glass-border:rgba(255,255,255,0.10);--glass-border-hi:rgba(255,255,255,0.18);--orange:#FF6B1A;--orange-glow:rgba(255,107,26,0.4);--white:#fff;--muted:#8B8B9A;--muted-2:#555566;--green:#4CAF50;--blue:#42A5F5}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--white);font-family:'Hanken Grotesk',sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;overflow-x:hidden;background-image:radial-gradient(ellipse 60% 50% at 50% 0%,rgba(255,107,26,0.10),transparent),radial-gradient(ellipse 50% 40% at 20% 80%,rgba(80,40,200,0.05),transparent);background-attachment:fixed}
+.card{max-width:420px;width:100%;padding:48px 40px;border-radius:32px;background:var(--glass);backdrop-filter:blur(40px) saturate(1.5);-webkit-backdrop-filter:blur(40px) saturate(1.5);border:0.5px solid var(--glass-border-hi);box-shadow:0 24px 70px rgba(0,0,0,0.6),inset 0 1px 0 rgba(255,255,255,0.1);position:relative;overflow:hidden;text-align:center}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:40%;background:linear-gradient(180deg,rgba(255,255,255,0.04),transparent);pointer-events:none}
+.logo svg{width:56px;height:56px;filter:drop-shadow(0 0 16px var(--orange-glow))}
+.logo h1{font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:1.6rem;margin-top:10px}
+.logo .sub{font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:var(--orange);letter-spacing:0.2em;text-transform:uppercase;margin-top:6px}
+h2{font-family:'Bricolage Grotesque',sans-serif;font-weight:600;font-size:1.3rem;margin:28px 0 6px}
+.desc{font-size:0.85rem;color:var(--muted);margin-bottom:28px}
+.input-group{position:relative;margin-bottom:16px}
+.input-group svg{position:absolute;left:16px;top:50%;transform:translateY(-50%);width:18px;height:18px;stroke:var(--muted);fill:none;stroke-width:1.5}
+.form-input{width:100%;background:var(--glass);border:0.5px solid var(--glass-border);border-radius:14px;padding:14px 16px 14px 46px;color:var(--white);font-size:0.9rem;font-family:inherit;transition:border-color .3s;text-align:left}
+.form-input:focus{outline:none;border-color:var(--orange)}
+.form-input::placeholder{color:var(--muted-2)}
+.btn{background:var(--orange);color:#000;padding:14px;border-radius:14px;font-weight:600;font-size:0.9rem;border:none;width:100%;transition:all .3s;box-shadow:0 4px 20px var(--orange-glow);display:inline-flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;margin-bottom:12px}
+.btn:hover{transform:translateY(-2px);box-shadow:0 8px 28px var(--orange-glow)}
+.btn-ghost{background:var(--glass);color:var(--white);border:0.5px solid var(--glass-border-hi);box-shadow:none;margin-bottom:8px}
+.divider{display:flex;align-items:center;gap:12px;margin:20px 0;color:var(--muted-2);font-size:0.72rem}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--glass-border)}
+.passkey-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:14px;border-radius:14px;background:var(--glass);border:0.5px solid var(--glass-border-hi);color:var(--white);font-size:0.88rem;font-weight:500;cursor:pointer;transition:all .3s;font-family:inherit;margin-bottom:12px}
+.passkey-btn:hover{background:rgba(255,255,255,0.08);border-color:var(--white)}
+.passkey-btn svg{width:20px;height:20px;stroke:var(--orange);fill:none;stroke-width:1.5}
+.bottom-link{margin-top:24px;font-size:0.82rem;color:var(--muted)}
+.bottom-link a{color:var(--orange);font-weight:600;text-decoration:none}
+.roles{display:flex;gap:8px;margin-top:20px}
+.role-chip{flex:1;padding:8px;border-radius:10px;background:var(--glass);border:0.5px solid var(--glass-border);font-size:0.72rem;color:var(--muted);cursor:pointer;transition:all .25s;text-align:center}
+.role-chip:hover,.role-chip.active{border-color:var(--orange);color:var(--orange)}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo">
+    <svg viewBox="0 0 100 100"><path d="M50 28 C28 28 14 50 14 50 C14 50 28 72 50 72 C72 72 86 50 86 50 C86 50 72 28 50 28 Z" stroke="#FF6B1A" stroke-width="3" fill="none"/><circle cx="50" cy="50" r="9" stroke="#FF6B1A" stroke-width="3" fill="none"/><circle cx="50" cy="50" r="3.5" fill="#FF6B1A"/></svg>
+    <h1>ARGES</h1>
+    <div class="sub">Welcome Back</div>
+  </div>
+
+  <!-- Passkey (primary method) -->
+  <button class="passkey-btn" onclick="location.href='family.html'">
+    <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+    Continue with Passkey
+  </button>
+
+  <div class="divider">OR</div>
+
+  <!-- Magic link -->
+  <h2>Sign in with email</h2>
+  <div class="desc">We'll send a magic link to your inbox.</div>
+  <div class="input-group">
+    <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+    <input class="form-input" type="email" placeholder="you@email.com">
+  </div>
+  <button class="btn" onclick="alert('Magic link sent! Check your email.')">Send Magic Link →</button>
+
+  <div class="bottom-link">
+    New to ARGES? <a href="signup.html">Create a family account →</a>
+  </div>
+
+  <div style="margin-top:20px;padding:14px;border-radius:12px;background:rgba(255,255,255,0.02);border:0.5px solid var(--glass-border);font-size:0.75rem;color:var(--muted-2)">
+    All accounts are protected by Passkey + 2FA. Your biometric data never leaves your device.
+  </div>
+</div>
+</body>
+</html>

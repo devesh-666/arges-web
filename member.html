@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ARGES — Karthik's Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=Hanken+Grotesk:wght@300;400;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#000008;--glass:rgba(255,255,255,0.05);--glass-hi:rgba(255,255,255,0.09);--glass-border:rgba(255,255,255,0.10);--glass-border-hi:rgba(255,255,255,0.18);--orange:#FF6B1A;--orange-bright:#FF8533;--orange-glow:rgba(255,107,26,0.4);--white:#fff;--muted:#8B8B9A;--muted-2:#555566;--green:#4CAF50;--red:#EF5350;--blue:#42A5F5;--purple:#AB47BC}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--white);font-family:'Hanken Grotesk',sans-serif;overflow-x:hidden;background-image:radial-gradient(ellipse 60% 50% at 20% 5%,rgba(21,101,192,0.06),transparent),radial-gradient(ellipse 50% 40% at 85% 30%,rgba(255,107,26,0.05),transparent);background-attachment:fixed;cursor:none}
+::selection{background:var(--blue);color:#000}
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--glass-border-hi);border-radius:3px}
+a{color:inherit;text-decoration:none}
+.cursor-dot,.cursor-ring{position:fixed;top:0;left:0;pointer-events:none;z-index:99999;border-radius:50%;transform:translate(-50%,-50%);mix-blend-mode:difference}
+.cursor-dot{width:6px;height:6px;background:#fff}
+.cursor-ring{width:30px;height:30px;border:1px solid rgba(255,255,255,0.4);transition:width .25s,height .25s,border-color .25s}
+.cursor-ring.hover{width:60px;height:60px;border-color:var(--blue);background:rgba(66,165,245,0.06)}
+@media(max-width:1024px){.cursor-dot,.cursor-ring{display:none}body{cursor:auto}}
+.app{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
+.sidebar{background:rgba(5,5,12,0.6);backdrop-filter:blur(40px);-webkit-backdrop-filter:blur(40px);border-right:0.5px solid var(--glass-border);padding:24px 16px;position:sticky;top:0;height:100vh;overflow-y:auto;display:flex;flex-direction:column}
+.sidebar-logo{display:flex;align-items:center;gap:10px;font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:1.15rem;margin-bottom:6px;padding:0 8px}
+.sidebar-logo svg{width:26px;height:26px}
+.sidebar-role{font-family:'JetBrains Mono',monospace;font-size:0.62rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--blue);padding:0 8px;margin-bottom:28px}
+.nav-item{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:12px;color:var(--muted);font-size:0.86rem;transition:all .25s;cursor:none;margin-bottom:2px}
+.nav-item:hover{background:var(--glass);color:var(--white)}
+.nav-item.active{background:rgba(66,165,245,0.08);color:var(--blue);border:0.5px solid rgba(66,165,245,0.15)}
+.nav-item svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.5;flex-shrink:0}
+.nav-badge{margin-left:auto;background:var(--blue);color:#000;font-size:0.65rem;font-weight:700;padding:2px 7px;border-radius:999px}
+.nav-badge.red{background:var(--red);color:#fff}
+.nav-badge.green{background:var(--green);color:#000}
+.nav-section-title{font-family:'JetBrains Mono',monospace;font-size:0.62rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted-2);padding:0 8px;margin-bottom:8px;margin-top:20px}
+.sidebar-footer{margin-top:auto;padding-top:20px;border-top:0.5px solid var(--glass-border)}
+.sidebar-user{display:flex;align-items:center;gap:10px;padding:8px;border-radius:12px}
+.sidebar-user .avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#1565C0,#42A5F5);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.85rem;color:#fff;flex-shrink:0}
+.main{padding:24px 32px;overflow-y:auto}
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:32px}
+.topbar h1{font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:1.75rem;letter-spacing:-0.02em}
+.topbar .subtitle{font-size:0.85rem;color:var(--muted);margin-top:2px}
+.topbar-actions{display:flex;gap:12px;align-items:center}
+.btn{background:var(--blue);color:#000;padding:10px 20px;border-radius:999px;font-weight:600;font-size:0.85rem;border:none;display:inline-flex;align-items:center;gap:6px;transition:all .3s;cursor:none;box-shadow:0 4px 16px rgba(66,165,245,0.3)}
+.btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(66,165,245,0.3)}
+.btn-ghost{background:var(--glass);color:var(--white);border:0.5px solid var(--glass-border-hi);box-shadow:none}
+.btn-ghost:hover{background:var(--glass-hi)}
+.btn-sm{padding:6px 14px;font-size:0.78rem}
+.btn.danger{background:var(--red);color:#fff;box-shadow:0 4px 16px rgba(239,83,80,0.3)}
+.panel{background:var(--glass);backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px);border:0.5px solid var(--glass-border);border-radius:24px;padding:24px;margin-bottom:20px;position:relative;overflow:hidden}
+.panel::before{content:'';position:absolute;top:0;left:0;right:0;height:30%;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);pointer-events:none}
+.panel-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.panel-title{font-family:'Bricolage Grotesque',sans-serif;font-weight:600;font-size:1.1rem}
+.panel-sub{font-size:0.78rem;color:var(--muted);margin-top:2px}
+.badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:999px;font-size:0.7rem;font-weight:600;font-family:'JetBrains Mono',monospace}
+.badge.green{background:rgba(76,175,80,0.12);color:var(--green);border:0.5px solid rgba(76,175,80,0.2)}
+.badge.red{background:rgba(239,83,80,0.12);color:var(--red);border:0.5px solid rgba(239,83,80,0.2)}
+.badge.yellow{background:rgba(249,168,37,0.12);color:#F9A825;border:0.5px solid rgba(249,168,37,0.2)}
+.badge.gray{background:rgba(255,255,255,0.05);color:var(--muted);border:0.5px solid var(--glass-border)}
+.badge.blue{background:rgba(66,165,245,0.12);color:var(--blue);border:0.5px solid rgba(66,165,245,0.2)}
+.badge .dot{width:6px;height:6px;border-radius:50%;background:currentColor}
+.badge.green .dot{animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+.user-avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:0.8rem;flex-shrink:0}
+.user-avatar.blind{background:linear-gradient(135deg,var(--orange),var(--orange-bright));color:#000}
+.user-avatar.family{background:linear-gradient(135deg,#1565C0,#42A5F5);color:#fff}
+.user-avatar.head{background:linear-gradient(135deg,var(--green),#66BB6A);color:#000}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;font-family:'JetBrains Mono',monospace;font-size:0.68rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);font-weight:500;padding:12px 16px;border-bottom:0.5px solid var(--glass-border)}
+td{padding:14px 16px;font-size:0.85rem;border-bottom:0.5px solid rgba(255,255,255,0.04);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(255,255,255,0.02)}
+.toggle{width:40px;height:22px;background:var(--glass-border-hi);border-radius:999px;position:relative;cursor:pointer;transition:background .3s;flex-shrink:0}
+.toggle.on{background:var(--blue)}
+.toggle::after{content:'';position:absolute;top:2px;left:2px;width:18px;height:18px;background:var(--white);border-radius:50%;transition:transform .3s}
+.toggle.on::after{transform:translateX(18px)}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(8px);z-index:9000;display:none;align-items:center;justify-content:center;padding:24px}
+.modal-overlay.show{display:flex}
+.modal{background:rgba(15,15,25,0.95);backdrop-filter:blur(60px);-webkit-backdrop-filter:blur(60px);border:0.5px solid var(--glass-border-hi);border-radius:28px;padding:32px;max-width:440px;width:100%;box-shadow:0 40px 120px rgba(0,0,0,0.8);position:relative;overflow:hidden}
+.modal h2{font-family:'Bricolage Grotesque',sans-serif;font-weight:600;font-size:1.3rem;margin-bottom:6px}
+.modal p{font-size:0.85rem;color:var(--muted);margin-bottom:24px}
+.modal-close{position:absolute;top:20px;right:20px;background:var(--glass);border:0.5px solid var(--glass-border);width:32px;height:32px;border-radius:10px;color:var(--muted);cursor:none;display:flex;align-items:center;justify-content:center;transition:all .25s}
+.modal-close:hover{background:var(--glass-hi);color:var(--white)}
+.modal-actions{display:flex;gap:12px;margin-top:24px}
+.modal-actions .btn{flex:1;justify-content:center}
+.form-group{margin-bottom:18px}
+.form-label{font-family:'JetBrains Mono',monospace;font-size:0.68rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--blue);margin-bottom:8px;display:block}
+.form-input,.form-select{width:100%;background:var(--glass);border:0.5px solid var(--glass-border);border-radius:12px;padding:12px 16px;color:var(--white);font-size:0.88rem;font-family:inherit;transition:border-color .3s}
+.form-input:focus,.form-select:focus{outline:none;border-color:var(--blue)}
+.form-select{appearance:none;cursor:none}
+.page{display:none}.page.active{display:block;animation:fadeIn .4s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.stat-card{background:var(--glass);backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px);border:0.5px solid var(--glass-border);border-radius:20px;padding:24px;transition:all .4s;position:relative;overflow:hidden}
+.stat-card:hover{border-color:var(--glass-border-hi);transform:translateY(-4px)}
+.stat-value{font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:2rem;letter-spacing:-0.02em}
+.stat-label{font-size:0.78rem;color:var(--muted);margin-top:4px}
+.stat-icon{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:16px}
+.stat-icon svg{width:20px;height:20px;stroke-width:1.5;fill:none}
+.stat-icon.blue{background:rgba(66,165,245,0.08);border:0.5px solid rgba(66,165,245,0.15)}.stat-icon.blue svg{stroke:var(--blue)}
+.stat-icon.orange{background:rgba(255,107,26,0.08);border:0.5px solid rgba(255,107,26,0.15)}.stat-icon.orange svg{stroke:var(--orange)}
+.stat-icon.green{background:rgba(76,175,80,0.08);border:0.5px solid rgba(76,175,80,0.15)}.stat-icon.green svg{stroke:var(--green)}
+.stat-icon.purple{background:rgba(171,71,188,0.08);border:0.5px solid rgba(171,71,188,0.15)}.stat-icon.purple svg{stroke:var(--purple)}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px}
+@media(max-width:1200px){.stats-grid{grid-template-columns:repeat(2,1fr)}}
+.sec-device{display:flex;align-items:center;justify-content:space-between;padding:14px;border-radius:14px;background:rgba(255,255,255,0.02);border:0.5px solid var(--glass-border);margin-bottom:10px;transition:all .3s}
+.sec-device:hover{background:rgba(255,255,255,0.04);border-color:var(--glass-border-hi)}
+.sec-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sec-icon svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.5}
+.sec-icon.key{background:rgba(66,165,245,0.08);color:var(--blue);border:0.5px solid rgba(66,165,245,0.15)}
+.sec-icon.shield{background:rgba(76,175,80,0.08);color:var(--green);border:0.5px solid rgba(76,175,80,0.15)}
+.passkey-card{padding:16px;border-radius:14px;background:rgba(66,165,245,0.04);border:0.5px solid rgba(66,165,245,0.12);margin-bottom:10px;display:flex;align-items:center;gap:14px}
+</style>
+</head>
+<body>
+<div class="cursor-dot" id="cursorDot"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<div class="app">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <a href="index.html" class="sidebar-logo">
+      <svg viewBox="0 0 100 100"><path d="M50 28 C28 28 14 50 14 50 C14 50 28 72 50 72 C72 72 86 50 86 50 C86 50 72 28 50 28 Z" stroke="#42A5F5" stroke-width="3" fill="none"/><circle cx="50" cy="50" r="9" stroke="#42A5F5" stroke-width="3" fill="none"/><circle cx="50" cy="50" r="3.5" fill="#42A5F5"/></svg>
+      ARGES
+    </a>
+    <div class="sidebar-role">Brother · Family Member</div>
+
+    <div class="nav-item active" data-page="overview">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      Overview
+    </div>
+    <div class="nav-item" data-page="ravi">
+      <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+      Ravi's Status
+    </div>
+    <div class="nav-item" data-page="location">
+      <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      Location
+    </div>
+    <div class="nav-item" data-page="history">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      Viewing History
+    </div>
+
+    <div class="nav-section-title">Account</div>
+    <div class="nav-item" data-page="security">
+      <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      Security
+      <span class="nav-badge green">2FA</span>
+    </div>
+    <div class="nav-item" data-page="settings">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      Settings
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="avatar">KA</div>
+        <div><div style="font-size:0.85rem;font-weight:600">Karthik</div><div style="font-size:0.7rem;color:var(--muted)">Ravi's Brother</div></div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <!-- ============ OVERVIEW ============ -->
+    <div class="page active" id="page-overview">
+      <div class="topbar">
+        <div><h1>Hi Karthik</h1><div class="subtitle">You're viewing Ravi's dashboard · You are <strong style="color:var(--blue)">Ravi's Brother</strong></div></div>
+        <div class="topbar-actions"><button class="btn" onclick="openModal('requestAccess')">Request to View</button></div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-icon orange"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></div><div class="stat-value" style="color:var(--orange)">Online</div><div class="stat-label">Ravi's Status</div></div>
+        <div class="stat-card"><div class="stat-icon green"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div><div class="stat-value">Home</div><div class="stat-label">Current Location</div></div>
+        <div class="stat-card"><div class="stat-icon blue"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div class="stat-value">2h</div><div class="stat-label">Since Last Check</div></div>
+        <div class="stat-card"><div class="stat-icon purple"><svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div><div class="stat-value">87%</div><div class="stat-label">Device Battery</div></div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1.3fr 1fr;gap:20px">
+        <div class="panel">
+          <div class="panel-header"><div><div class="panel-title">Ravi's Live Status</div><div class="panel-sub">Real-time data from ARGES glasses</div></div><span class="badge green"><span class="dot"></span>Wearing</span></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div style="padding:16px;background:rgba(255,255,255,0.02);border-radius:14px;border:0.5px solid var(--glass-border)">
+              <div style="font-size:0.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px">Location</div>
+              <div style="font-weight:600">Home · Coimbatore</div>
+              <div style="font-size:0.72rem;color:var(--muted);font-family:'JetBrains Mono',monospace;margin-top:4px">Updated 3m ago</div>
+            </div>
+            <div style="padding:16px;background:rgba(255,255,255,0.02);border-radius:14px;border:0.5px solid var(--glass-border)">
+              <div style="font-size:0.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px">Activity</div>
+              <div style="font-weight:600">Reading</div>
+              <div style="font-size:0.72rem;color:var(--muted);margin-top:4px">Last AI query: 8m ago</div>
+            </div>
+            <div style="padding:16px;background:rgba(255,255,255,0.02);border-radius:14px;border:0.5px solid var(--glass-border)">
+              <div style="font-size:0.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px">Privacy Mode</div>
+              <div style="font-weight:600;color:var(--green)">Consent Active</div>
+              <div style="font-size:0.72rem;color:var(--muted);margin-top:4px">Video needs permission</div>
+            </div>
+            <div style="padding:16px;background:rgba(255,255,255,0.02);border-radius:14px;border:0.5px solid var(--glass-border)">
+              <div style="font-size:0.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px">Face Verify</div>
+              <div style="font-weight:600;color:var(--green)">Verified ✓</div>
+              <div style="font-size:0.72rem;color:var(--muted);margin-top:4px">Confirmed: Ravi</div>
+            </div>
+          </div>
+          <div style="margin-top:16px;padding:14px;border-radius:12px;background:rgba(66,165,245,0.04);border:0.5px solid rgba(66,165,245,0.12);font-size:0.82rem;color:var(--muted);display:flex;align-items:center;gap:10px">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--blue)" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><circle cx="12" cy="8" r="0.5"/></svg>
+            As a Brother, you can see Ravi's location always. To see video/audio, you must request consent — Ravi will hear your name and relation.
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header"><div><div class="panel-title">Quick Actions</div></div></div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <button class="btn" style="justify-content:flex-start;padding:14px" onclick="openModal('requestAccess')">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+              Request Video Access
+            </button>
+            <button class="btn btn-ghost" style="justify-content:flex-start;padding:14px">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+              Call Ravi
+            </button>
+            <button class="btn btn-ghost" style="justify-content:flex-start;padding:14px">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              View Location (Always Available)
+            </button>
+          </div>
+          <div style="margin-top:16px;padding:14px;border-radius:12px;background:rgba(255,255,255,0.02);border:0.5px solid var(--glass-border)">
+            <div style="font-size:0.78rem;color:var(--muted);margin-bottom:10px;font-weight:600">Recent Activity</div>
+            <div style="font-size:0.78rem;color:var(--muted);margin-bottom:6px">· Ravi read a sign · 8m ago</div>
+            <div style="font-size:0.78rem;color:var(--muted);margin-bottom:6px">· Ravi navigated to kitchen · 22m ago</div>
+            <div style="font-size:0.78rem;color:var(--muted)">· You viewed Ravi · yesterday (15 min)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ RAVI STATUS ============ -->
+    <div class="page" id="page-ravi">
+      <div class="topbar"><div><h1>Ravi's Status</h1><div class="subtitle">Live data from ARGES glasses</div></div><span class="badge green"><span class="dot"></span>Online · Wearing</span></div>
+      <div class="panel">
+        <div style="display:flex;align-items:center;gap:20px;margin-bottom:24px">
+          <div class="user-avatar blind" style="width:64px;height:64px;font-size:1.3rem">RA</div>
+          <div><div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:1.5rem">Ravi Kumar</div><div style="font-size:0.85rem;color:var(--muted)">Your Brother · ARGES Device: ARGES-0014 · v2.1.3</div></div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
+          <div style="padding:18px;background:rgba(255,255,255,0.02);border-radius:14px;border:0.5px solid var(--glass-border);text-align:center">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px">Battery</div>
+            <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:1.6rem;color:var(--green)">87%</div>
+            <div style="font-size:0.7rem;color:var(--muted);margin-top:4px">~4h remaining</div>
+          </div>
+          <div style="padding:18px;background:rgba(255,255,255,0.02);border-radius:14px;border:0.5px solid var(--glass-border);text-align:center">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px">Temperature</div>
+            <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:1.6rem;color:var(--green)">38°C</div>
+            <div style="font-size:0.7rem;color:var(--muted);margin-top:4px">Normal range</div>
+          </div>
+          <div style="padding:18px;background:rgba(255,255,255,0.02);border-radius:14px;border:0.5px solid var(--glass-border);text-align:center">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px">Uptime</div>
+            <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:1.6rem;color:var(--blue)">2h 14m</div>
+            <div style="font-size:0.7rem;color:var(--muted);margin-top:4px">Since last charge</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ LOCATION ============ -->
+    <div class="page" id="page-location">
+      <div class="topbar"><div><h1>Ravi's Location</h1><div class="subtitle">GPS is always visible to family · No consent needed</div></div></div>
+      <div class="panel">
+        <div style="aspect-ratio:16/9;border-radius:20px;background:linear-gradient(135deg,#0A0A18,#14142B);border:0.5px solid var(--glass-border-hi);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;margin-bottom:20px">
+          <div style="position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 30px,rgba(66,165,245,0.03) 30px,rgba(66,165,245,0.03) 31px),repeating-linear-gradient(90deg,transparent,transparent 30px,rgba(66,165,245,0.03) 30px,rgba(66,165,245,0.03) 31px)"></div>
+          <div style="text-align:center;position:relative;z-index:1">
+            <div style="width:20px;height:20px;border-radius:50%;background:var(--orange);box-shadow:0 0 24px var(--orange-glow);margin:0 auto 12px;animation:pulse 2s infinite"></div>
+            <div style="font-weight:600;font-size:0.95rem">Home · Coimbatore, TN</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:0.72rem;color:var(--muted);margin-top:4px">11.0168°N 76.9558°E</div>
+            <div style="font-size:0.72rem;color:var(--muted);margin-top:8px">Updated 3 minutes ago</div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
+          <div style="padding:14px;border-radius:12px;background:rgba(255,255,255,0.02);border:0.5px solid var(--glass-border)"><div style="font-size:0.65rem;color:var(--muted);text-transform:uppercase;margin-bottom:4px">Speed</div><div style="font-weight:600">0 km/h</div></div>
+          <div style="padding:14px;border-radius:12px;background:rgba(255,255,255,0.02);border:0.5px solid var(--glass-border)"><div style="font-size:0.65rem;color:var(--muted);text-transform:uppercase;margin-bottom:4px">Safe Zone</div><div style="font-weight:600;color:var(--green)">Inside "Home"</div></div>
+          <div style="padding:14px;border-radius:12px;background:rgba(255,255,255,0.02);border:0.5px solid var(--glass-border)"><div style="font-size:0.65rem;color:var(--muted);text-transform:uppercase;margin-bottom:4px">Accuracy</div><div style="font-weight:600">±8m</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ VIEWING HISTORY ============ -->
+    <div class="page" id="page-history">
+      <div class="topbar"><div><h1>Viewing History</h1><div class="subtitle">Your consent-based access sessions</div></div></div>
+      <div class="panel">
+        <div class="panel-header"><div><div class="panel-title">Your Sessions</div><div class="panel-sub">Every time you viewed Ravi (with consent)</div></div></div>
+        <table>
+          <thead><tr><th>Date</th><th>Duration</th><th>Type</th><th>Result</th><th>Notes</th></tr></thead>
+          <tbody>
+            <tr><td style="font-family:'JetBrains Mono',monospace;font-size:0.78rem">Aug 11, 6:30 PM</td><td>15 min</td><td><span class="badge blue">Video + Audio</span></td><td><span class="badge green"><span class="dot"></span>Accepted</span></td><td style="font-size:0.78rem;color:var(--muted)">Ravi accepted immediately</td></tr>
+            <tr><td style="font-family:'JetBrains Mono',monospace;font-size:0.78rem">Aug 10, 9:00 AM</td><td>—</td><td><span class="badge gray">Video</span></td><td><span class="badge red"><span class="dot"></span>Declined</span></td><td style="font-size:0.78rem;color:var(--muted)">Ravi was busy</td></tr>
+            <tr><td style="font-family:'JetBrains Mono',monospace;font-size:0.78rem">Aug 9, 7:15 PM</td><td>30 min</td><td><span class="badge blue">Video + Audio</span></td><td><span class="badge green"><span class="dot"></span>Accepted</span></td><td style="font-size:0.78rem;color:var(--muted)">Ended by Ravi at 7:40</td></tr>
+            <tr><td style="font-family:'JetBrains Mono',monospace;font-size:0.78rem">Aug 8, 3:00 PM</td><td>10 min</td><td><span class="badge gray">Audio Only</span></td><td><span class="badge yellow"><span class="dot"></span>Auto-Declined</span></td><td style="font-size:0.78rem;color:var(--muted)">No response (30s timeout)</td></tr>
+            <tr><td style="font-family:'JetBrains Mono',monospace;font-size:0.78rem">Aug 7, 8:00 PM</td><td>15 min</td><td><span class="badge blue">Emergency</span></td><td><span class="badge green"><span class="dot"></span>Auto-Granted</span></td><td style="font-size:0.78rem;color:var(--muted)">Fall detected → instant access</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ============ SECURITY (same as family head) ============ -->
+    <div class="page" id="page-security">
+      <div class="topbar"><div><h1>Security</h1><div class="subtitle">Protect your account</div></div><span class="badge green"><span class="dot"></span>Secured</span></div>
+      <div class="panel">
+        <div style="display:flex;align-items:center;gap:20px">
+          <div style="width:80px;height:80px;border-radius:50%;background:conic-gradient(var(--green) 0% 85%,rgba(255,255,255,0.06) 85% 100%);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <div style="width:64px;height:64px;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column">
+              <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:1.4rem;color:var(--green)">85%</div>
+              <div style="font-size:0.55rem;color:var(--muted);text-transform:uppercase">Secure</div>
+            </div>
+          </div>
+          <div><div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:600;font-size:1.1rem;margin-bottom:4px">Good security</div><div style="font-size:0.82rem;color:var(--muted)">Add a backup passkey for maximum protection.</div></div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+        <div class="panel">
+          <div class="panel-header"><div><div class="panel-title">Passkeys</div></div><button class="btn btn-ghost btn-sm">+ Add</button></div>
+          <div class="passkey-card"><div class="sec-icon key"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><circle cx="12" cy="16" r="1"/></svg></div><div style="flex:1"><div style="font-weight:600;font-size:0.88rem">iPhone 14 (Face ID)</div><div style="font-size:0.72rem;color:var(--muted)">Mobile · Aug 5, 2026</div></div><span class="badge green">Active</span></div>
+        </div>
+        <div class="panel">
+          <div class="panel-header"><div><div class="panel-title">Two-Factor Auth</div></div><span class="badge green">On</span></div>
+          <div class="sec-device"><div style="display:flex;align-items:center;gap:14px"><div class="sec-icon shield"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><div><div style="font-size:0.85rem;font-weight:600">Authenticator App</div><div style="font-size:0.72rem;color:var(--muted)">30s codes · 10 backup codes</div></div></div></div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-header"><div><div class="panel-title">Active Sessions</div></div></div>
+        <div class="sec-device"><div style="display:flex;align-items:center;gap:14px"><div class="sec-icon key"><svg viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/></svg></div><div><div style="font-size:0.85rem;font-weight:600">Safari · iPhone 14</div><div style="font-size:0.68rem;color:var(--muted);font-family:'JetBrains Mono',monospace">Bengaluru · Now</div></div></div><span class="badge green">This device</span></div>
+      </div>
+    </div>
+
+    <!-- ============ SETTINGS ============ -->
+    <div class="page" id="page-settings">
+      <div class="topbar"><div><h1>Settings</h1><div class="subtitle">Your preferences</div></div></div>
+      <div class="panel">
+        <div class="panel-header"><div><div class="panel-title">Notifications</div></div></div>
+        <div class="sec-device"><div><div style="font-size:0.85rem;font-weight:600">SOS Alerts</div><div style="font-size:0.72rem;color:var(--muted)">When Ravi triggers SOS</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+        <div class="sec-device"><div><div style="font-size:0.85rem;font-weight:600">Fall Detection</div><div style="font-size:0.72rem;color:var(--muted)">When Ravi's glasses detect a fall</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+        <div class="sec-device"><div><div style="font-size:0.85rem;font-weight:600">Face Verify Alerts</div><div style="font-size:0.72rem;color:var(--muted)">Unverified wearer detected</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+        <div class="sec-device"><div><div style="font-size:0.85rem;font-weight:600">Location Updates</div><div style="font-size:0.72rem;color:var(--muted)">Periodic location summaries</div></div><div class="toggle" onclick="this.classList.toggle('on')"></div></div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- REQUEST ACCESS MODAL -->
+<div class="modal-overlay" id="modal-requestAccess">
+  <div class="modal" style="text-align:center">
+    <button class="modal-close" onclick="closeModal('requestAccess')"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    <div style="width:72px;height:72px;border-radius:50%;margin:0 auto 20px;background:radial-gradient(circle,rgba(66,165,245,0.12),rgba(66,165,245,0.03));border:2px solid rgba(66,165,245,0.2);display:flex;align-items:center;justify-content:center">
+      <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="var(--blue)" stroke-width="1.5"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+    </div>
+    <h2>Request Video Access</h2>
+    <p style="margin-bottom:20px">Ravi will hear: <em style="color:var(--blue)">"Your brother Karthik is requesting to see your camera and microphone for 15 minutes. Say accept or decline."</em></p>
+    <div class="form-group"><label class="form-label">Duration</label><select class="form-select"><option>5 minutes</option><option selected>15 minutes</option><option>30 minutes</option><option>60 minutes</option></select></div>
+    <div class="form-group"><label class="form-label">Include</label></div>
+    <div class="sec-device"><div style="font-size:0.85rem">Camera (video)</div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+    <div class="sec-device"><div style="font-size:0.85rem">Microphone (audio)</div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+    <div class="modal-actions"><button class="btn btn-ghost" onclick="closeModal('requestAccess')">Cancel</button><button class="btn" onclick="closeModal('requestAccess')">Send Request →</button></div>
+  </div>
+</div>
+
+<script>
+const dot=document.getElementById('cursorDot'),ring=document.getElementById('cursorRing');let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;dot.style.left=mx+'px';dot.style.top=my+'px'});
+(function a(){rx+=(mx-rx)*0.15;ry+=(my-ry)*0.15;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(a)})();
+document.querySelectorAll('a,button,.nav-item,.toggle').forEach(el=>{el.addEventListener('mouseenter',()=>ring.classList.add('hover'));el.addEventListener('mouseleave',()=>ring.classList.remove('hover'))});
+document.querySelectorAll('[data-page]').forEach(el=>{el.addEventListener('click',()=>{const page=el.getAttribute('data-page');document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById('page-'+page).classList.add('active');document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));document.querySelector('.nav-item[data-page="'+page+'"]')?.classList.add('active')})});
+function openModal(id){document.getElementById('modal-'+id).classList.add('show')}
+function closeModal(id){document.getElementById('modal-'+id).classList.remove('show')}
+document.querySelectorAll('.modal-overlay').forEach(o=>{o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('show')})});
+</script>
+</body>
+</html>
