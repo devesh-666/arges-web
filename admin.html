@@ -353,6 +353,10 @@ tr:hover td{background:rgba(255,255,255,0.02)}
         <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
         Analytics
       </div>
+      <div class="nav-item" data-page="usermap">
+        <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        User Map
+      </div>
       <div class="nav-item" data-page="financial">
         <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
         Financial
@@ -816,6 +820,28 @@ tr:hover td{background:rgba(255,255,255,0.02)}
             </div>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- ============ USER MAP PAGE ============ -->
+    <div class="page" id="page-usermap">
+      <div class="topbar">
+        <div><h1>User Map</h1><div class="subtitle">All ARGES users across India · Real-time locations</div></div>
+        <div class="topbar-actions">
+          <button class="btn btn-ghost btn-sm" onclick="filterMap('all')">All Users</button>
+          <button class="btn btn-ghost btn-sm" onclick="filterMap('blind')">Blind Only</button>
+          <button class="btn btn-ghost btn-sm" onclick="filterMap('online')">Online Only</button>
+        </div>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-icon orange"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></div><div class="stat-value">923</div><div class="stat-label">Blind Users Mapped</div></div>
+        <div class="stat-card"><div class="stat-icon green"><svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div><div class="stat-value">836</div><div class="stat-label">Online Now</div></div>
+        <div class="stat-card"><div class="stat-icon red"><svg viewBox="0 0 24 24"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/></svg></div><div class="stat-value">3</div><div class="stat-label">SOS Active</div></div>
+        <div class="stat-card"><div class="stat-icon blue"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div><div class="stat-value">7</div><div class="stat-label">States Covered</div></div>
+      </div>
+      <div class="panel">
+        <div class="panel-header"><div><div class="panel-title">India — All Users</div><div class="panel-sub">Click markers for details · Dark theme map</div></div></div>
+        <div id="adminMap" style="height:500px;border-radius:20px;overflow:hidden;border:0.5px solid var(--glass-border-hi)"></div>
       </div>
     </div>
 
@@ -1542,6 +1568,57 @@ if(faceDisplay){
   },4000);
 }
 
+</script>
+<!-- LEAFLET MAP -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+let adminMapMarkers=[];
+function initAdminMap(){
+  if(window._adminMap) return;
+  const el=document.getElementById('adminMap');
+  if(!el||!el.offsetWidth) return;
+  const map=L.map(el,{zoomControl:true,attributionControl:false}).setView([20.5937,78.9629],5);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{maxZoom:19}).addTo(map);
+  window._adminMap=map;
+  // Major Indian cities with users
+  const cities=[
+    {lat:11.0168,lng:76.9558,n:'Coimbatore',blind:284,online:268,sos:0},
+    {lat:12.9716,lng:77.5946,n:'Bengaluru',blind:198,online:182,sos:1},
+    {lat:13.0827,lng:80.2707,n:'Chennai',blind:147,online:131,sos:1},
+    {lat:19.0760,lng:72.8777,n:'Mumbai',blind:112,online:98,sos:0},
+    {lat:17.3850,lng:78.4867,n:'Hyderabad',blind:89,online:81,sos:0},
+    {lat:28.7041,lng:77.1025,n:'Delhi',blind:54,online:47,sos:1},
+    {lat:9.9312,lng:76.2673,n:'Kochi',blind:39,online:35,sos:0},
+  ];
+  cities.forEach(c=>{
+    // Circle radius proportional to users
+    const radius=Math.max(5000,c.blind*200);
+    L.circle([c.lat,c.lng],{color:'#FF6B1A',fillColor:'#FF6B1A',fillOpacity:0.06,radius:radius}).addTo(map);
+    // Marker
+    const hasSos=c.sos>0;
+    const color=hasSos?'#EF5350':'#FF6B1A';
+    const icon=L.divIcon({html:'<div style="width:14px;height:14px;border-radius:50%;background:'+color+';box-shadow:0 0 12px '+color+'99;border:2px solid #fff'+(hasSos?';animation:pulse 2s infinite':'')+'"></div>',className:'',iconSize:[14,14],iconAnchor:[7,7]});
+    const m=L.marker([c.lat,c.lng],{icon}).addTo(map).bindPopup(
+      '<b>'+c.n+'</b><br>'+
+      (hasSos?'<span style="color:#EF5350">SOS ACTIVE</span><br>':'')+
+      'Blind users: '+c.blind+'<br>'+
+      'Online: '+c.online+'<br>'+
+      'SOS: '+c.sos
+    );
+    adminMapMarkers.push({marker:m,city:c});
+  });
+}
+function filterMap(type){
+  if(!window._adminMap) return;
+  adminMapMarkers.forEach(m=>window._adminMap.removeLayer(m.marker));
+  adminMapMarkers.forEach(item=>{
+    if(type==='all'||(type==='blind')||(type==='online'&&item.city.online>0)){
+      item.marker.addTo(window._adminMap);
+    }
+  });
+}
+document.querySelector('.nav-item[data-page="usermap"]')?.addEventListener('click',()=>setTimeout(initAdminMap,200));
 </script>
 </body>
 </html>

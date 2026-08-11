@@ -258,19 +258,11 @@ tr:hover td{background:rgba(255,255,255,0.02)}
       </div>
     </div>
 
-    <!-- ============ LOCATION ============ -->
+    <!-- ============ LOCATION (real Leaflet map) ============ -->
     <div class="page" id="page-location">
-      <div class="topbar"><div><h1>Ravi's Location</h1><div class="subtitle">GPS is always visible to family · No consent needed</div></div></div>
+      <div class="topbar"><div><h1>Ravi's Location</h1><div class="subtitle">GPS is always visible to family · No consent needed</div></div><span class="badge green"><span class="dot"></span>Updated 3m ago</span></div>
       <div class="panel">
-        <div style="aspect-ratio:16/9;border-radius:20px;background:linear-gradient(135deg,#0A0A18,#14142B);border:0.5px solid var(--glass-border-hi);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;margin-bottom:20px">
-          <div style="position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 30px,rgba(66,165,245,0.03) 30px,rgba(66,165,245,0.03) 31px),repeating-linear-gradient(90deg,transparent,transparent 30px,rgba(66,165,245,0.03) 30px,rgba(66,165,245,0.03) 31px)"></div>
-          <div style="text-align:center;position:relative;z-index:1">
-            <div style="width:20px;height:20px;border-radius:50%;background:var(--orange);box-shadow:0 0 24px var(--orange-glow);margin:0 auto 12px;animation:pulse 2s infinite"></div>
-            <div style="font-weight:600;font-size:0.95rem">Home · Coimbatore, TN</div>
-            <div style="font-family:'JetBrains Mono',monospace;font-size:0.72rem;color:var(--muted);margin-top:4px">11.0168°N 76.9558°E</div>
-            <div style="font-size:0.72rem;color:var(--muted);margin-top:8px">Updated 3 minutes ago</div>
-          </div>
-        </div>
+        <div id="memberMap" style="height:400px;border-radius:20px;overflow:hidden;border:0.5px solid var(--glass-border-hi);margin-bottom:16px"></div>
         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
           <div style="padding:14px;border-radius:12px;background:rgba(255,255,255,0.02);border:0.5px solid var(--glass-border)"><div style="font-size:0.65rem;color:var(--muted);text-transform:uppercase;margin-bottom:4px">Speed</div><div style="font-weight:600">0 km/h</div></div>
           <div style="padding:14px;border-radius:12px;background:rgba(255,255,255,0.02);border:0.5px solid var(--glass-border)"><div style="font-size:0.65rem;color:var(--muted);text-transform:uppercase;margin-bottom:4px">Safe Zone</div><div style="font-weight:600;color:var(--green)">Inside "Home"</div></div>
@@ -368,6 +360,23 @@ document.querySelectorAll('[data-page]').forEach(el=>{el.addEventListener('click
 function openModal(id){document.getElementById('modal-'+id).classList.add('show')}
 function closeModal(id){document.getElementById('modal-'+id).classList.remove('show')}
 document.querySelectorAll('.modal-overlay').forEach(o=>{o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('show')})});
+</script>
+<!-- LEAFLET MAP -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+function initMemberMap(){
+  if(window._memberMap) return;
+  const el=document.getElementById('memberMap');
+  if(!el||!el.offsetWidth) return;
+  const map=L.map(el,{zoomControl:true,attributionControl:false}).setView([11.0168,76.9558],15);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{maxZoom:19}).addTo(map);
+  L.circle([11.0168,76.9558],{color:'#42A5F5',fillColor:'#42A5F5',fillOpacity:0.08,radius:200}).addTo(map);
+  const icon=L.divIcon({html:'<div style="width:16px;height:16px;border-radius:50%;background:#FF6B1A;box-shadow:0 0 16px rgba(255,107,26,0.6);border:2px solid #fff"></div>',className:'',iconSize:[16,16],iconAnchor:[8,8]});
+  L.marker([11.0168,76.9558],{icon}).addTo(map).bindPopup('<b>Ravi Kumar</b><br>Your Brother<br>Home · Coimbatore');
+  window._memberMap=map;
+}
+document.querySelector('.nav-item[data-page="location"]')?.addEventListener('click',()=>setTimeout(initMemberMap,200));
 </script>
 </body>
 </html>
