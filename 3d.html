@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ARGES — How It Works in 3D</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=Hanken+Grotesk:wght@300;400;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   ARGES — How It Works · Scroll-Driven 3D (Hyperframes style)
+   The 3D model stays pinned. As you scroll, it rotates and the
+   step text changes beside it.
+   ============================================================ */
+:root{
+  --bg:#000008;
+  --glass:rgba(255,255,255,0.06);
+  --glass-hi:rgba(255,255,255,0.1);
+  --glass-border:rgba(255,255,255,0.14);
+  --glass-border-hi:rgba(255,255,255,0.24);
+  --orange:#FF6B1A; --orange-bright:#FF8533; --orange-glow:rgba(255,107,26,0.4);
+  --white:#fff; --muted:#9999AA;
+  --shadow:0 24px 80px rgba(0,0,0,0.7),inset 0 1px 0 rgba(255,255,255,0.12);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);color:var(--white);
+  font-family:'Hanken Grotesk',sans-serif;
+  overflow-x:hidden;
+  background-image:
+    radial-gradient(ellipse 60% 50% at 50% 0%,rgba(255,107,26,0.10),transparent),
+    radial-gradient(ellipse 50% 40% at 20% 50%,rgba(80,40,200,0.05),transparent),
+    radial-gradient(ellipse 70% 60% at 80% 80%,rgba(255,107,26,0.06),transparent);
+  background-attachment:fixed;
+}
+a{color:inherit;text-decoration:none}
+
+/* ==================== NAVBAR (same as main) ==================== */
+.nav{position:fixed;top:24px;left:50%;transform:translateX(-50%);z-index:1000;display:flex;align-items:center;justify-content:space-between;width:calc(100% - 60px);max-width:1100px;padding:10px 10px 10px 24px;border-radius:999px;background:rgba(10,10,20,0.4);backdrop-filter:blur(60px) saturate(1.8);-webkit-backdrop-filter:blur(60px) saturate(1.8);border:0.5px solid var(--glass-border);box-shadow:0 16px 50px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.08)}
+.nav-logo{display:flex;align-items:center;gap:10px;font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:1.15rem}
+.nav-logo svg{width:26px;height:26px}
+.nav-back{color:rgba(255,255,255,0.7);font-size:0.85rem;display:inline-flex;align-items:center;gap:6px;transition:color .3s}
+.nav-back:hover{color:#fff}
+.nav-cta{background:var(--orange);color:#000;padding:10px 22px;border-radius:999px;font-size:0.83rem;font-weight:600;transition:all .4s;box-shadow:0 4px 16px var(--orange-glow)}
+.nav-cta:hover{transform:scale(1.05)}
+
+/* ==================== INTRO HERO ==================== */
+.intro{min-height:70vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:120px 24px 40px;position:relative;z-index:1}
+.intro .label{font-family:'JetBrains Mono',monospace;font-size:0.72rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--orange);margin-bottom:24px}
+.intro h1{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(2.5rem,7vw,5rem);line-height:0.95;letter-spacing:-0.04em;margin-bottom:20px}
+.intro p{max-width:560px;color:var(--muted);font-size:1.05rem;line-height:1.65}
+.scroll-cue{margin-top:48px;display:flex;flex-direction:column;align-items:center;gap:10px;color:var(--muted);font-size:0.7rem;letter-spacing:0.2em}
+.scroll-cue .line{width:1px;height:50px;background:linear-gradient(to bottom,transparent,var(--orange));animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:0.3;transform:scaleY(0.5)}50%{opacity:1;transform:scaleY(1)}}
+
+/* ==================== SCROLL 3D SECTION (the core) ==================== */
+.scroll-3d{
+  position:relative;
+  height:500vh; /* 5 steps × 100vh each */
+}
+.scroll-sticky{
+  position:sticky;top:0;
+  height:100vh;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  align-items:center;
+  overflow:hidden;
+}
+/* LEFT: 3D canvas (sticky, rotates with scroll) */
+.scroll-canvas-wrap{
+  position:relative;
+  height:100%;
+  display:flex;align-items:center;justify-content:center;
+}
+.scroll-canvas{width:100%;height:100%;cursor:grab}
+.scroll-canvas:active{cursor:grabbing}
+/* Floating labels over 3D */
+.canvas-badge{
+  position:absolute;
+  background:var(--glass);
+  backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px);
+  border:0.5px solid var(--glass-border-hi);
+  border-radius:14px;padding:10px 18px;
+  box-shadow:var(--shadow);
+  font-size:0.78rem;
+  display:flex;align-items:center;gap:10px;
+  opacity:0;transition:opacity .6s;
+}
+.canvas-badge.show{opacity:1}
+.canvas-badge .dot{width:8px;height:8px;border-radius:50%;background:var(--orange);box-shadow:0 0 8px var(--orange-glow)}
+.canvas-badge .v{font-weight:600}
+.canvas-badge .l{font-size:0.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em}
+.badge-1{top:20%;left:15%}
+.badge-2{top:30%;right:18%}
+.badge-3{bottom:25%;left:20%}
+.badge-4{bottom:30%;right:15%}
+.badge-5{top:50%;right:10%}
+
+/* RIGHT: Step text (changes as you scroll) */
+.scroll-steps{
+  padding:0 8vw 0 4vw;
+  position:relative;
+}
+.step{
+  position:absolute;
+  top:50%;transform:translateY(-50%);
+  opacity:0;
+  transition:opacity .8s cubic-bezier(0.16,1,0.3,1),transform .8s cubic-bezier(0.16,1,0.3,1);
+  transform:translateY(40px);
+  max-width:460px;
+}
+.step.active{opacity:1;transform:translateY(-50%)}
+.step-num{font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--orange);letter-spacing:0.16em;margin-bottom:20px}
+.step h2{font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:clamp(1.8rem,3.5vw,2.8rem);letter-spacing:-0.03em;line-height:1.05;margin-bottom:18px}
+.step p{color:var(--muted);font-size:1rem;line-height:1.7;margin-bottom:20px}
+.step-tech{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--glass);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border:0.5px solid var(--glass-border);
+  padding:8px 16px;border-radius:999px;
+  font-size:0.78rem;font-family:'JetBrains Mono',monospace;
+  color:var(--orange-bright);
+}
+
+/* ==================== SCROLL PROGRESS BAR (left edge) ==================== */
+.progress-rail{
+  position:fixed;
+  left:40px;top:50%;
+  transform:translateY(-50%);
+  width:3px;height:240px;
+  background:rgba(255,255,255,0.08);
+  border-radius:999px;
+  z-index:50;
+}
+.progress-fill{
+  width:100%;height:0%;
+  background:linear-gradient(to bottom,var(--orange),var(--orange-bright));
+  border-radius:999px;
+  transition:height .1s linear;
+  box-shadow:0 0 12px var(--orange-glow);
+}
+.progress-dots{position:absolute;left:-7px;top:0;width:17px;height:100%}
+.progress-dot{
+  position:absolute;
+  width:17px;height:17px;
+  border-radius:50%;
+  background:var(--bg);
+  border:2px solid rgba(255,255,255,0.15);
+  transition:all .4s;
+}
+.progress-dot.active{border-color:var(--orange);box-shadow:0 0 12px var(--orange-glow);background:var(--orange)}
+.progress-dot.done{border-color:var(--orange);background:var(--orange)}
+
+@media(max-width:900px){
+  .scroll-sticky{grid-template-columns:1fr;grid-template-rows:50% 50%}
+  .scroll-canvas-wrap{height:50%}
+  .scroll-steps{padding:0 6vw}
+  .progress-rail{display:none}
+  .canvas-badge{display:none}
+}
+
+/* ==================== OUTRO CTA ==================== */
+.outro{min-height:60vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:120px 24px;position:relative;z-index:1}
+.outro-card{
+  max-width:700px;padding:80px 40px;border-radius:40px;
+  background:radial-gradient(circle at 50% 0%,rgba(255,107,26,0.12),transparent 60%),var(--glass);
+  backdrop-filter:blur(50px) saturate(1.6);-webkit-backdrop-filter:blur(50px) saturate(1.6);
+  border:0.5px solid var(--glass-border-hi);
+  box-shadow:0 40px 120px rgba(0,0,0,0.6),inset 0 1px 0 rgba(255,255,255,0.12);
+}
+.outro h2{font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:clamp(2rem,4vw,3.2rem);letter-spacing:-0.03em;line-height:1;margin-bottom:20px}
+.outro p{color:var(--muted);margin-bottom:36px;font-size:1.05rem}
+.btn-primary{background:var(--orange);color:#000;padding:16px 38px;border-radius:999px;font-weight:600;font-size:0.92rem;border:none;display:inline-flex;align-items:center;gap:8px;transition:all .4s;box-shadow:0 8px 32px var(--orange-glow);cursor:pointer}
+.btn-primary:hover{transform:translateY(-4px);box-shadow:0 16px 48px var(--orange-glow)}
+.btn-ghost{background:transparent;color:#fff;padding:16px 38px;border-radius:999px;font-weight:500;font-size:0.92rem;border:0.5px solid var(--glass-border-hi);display:inline-flex;align-items:center;gap:8px;transition:all .3s;cursor:pointer;margin-left:12px}
+.btn-ghost:hover{background:var(--glass-hi);border-color:rgba(255,255,255,0.35)}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <a href="index.html" class="nav-logo">
+    <svg viewBox="0 0 100 100"><path d="M50 28 C28 28 14 50 14 50 C14 50 28 72 50 72 C72 72 86 50 86 50 C86 50 72 28 50 28 Z" stroke="#FF6B1A" stroke-width="3" fill="none"/><circle cx="50" cy="50" r="9" stroke="#FF6B1A" stroke-width="3" fill="none"/><circle cx="50" cy="50" r="3.5" fill="#FF6B1A"/></svg>
+    ARGES
+  </a>
+  <a href="index.html" class="nav-back">← Back to Home</a>
+  <a href="index.html#cta" class="nav-cta">Get ARGES</a>
+</nav>
+
+<!-- PROGRESS RAIL -->
+<div class="progress-rail">
+  <div class="progress-fill" id="progressFill"></div>
+  <div class="progress-dots" id="progressDots">
+    <div class="progress-dot" style="top:0%"></div>
+    <div class="progress-dot" style="top:25%"></div>
+    <div class="progress-dot" style="top:50%"></div>
+    <div class="progress-dot" style="top:75%"></div>
+    <div class="progress-dot" style="top:100%;transform:translateY(-100%)"></div>
+  </div>
+</div>
+
+<!-- INTRO -->
+<section class="intro">
+  <div class="label">/ How It Works</div>
+  <h1>From voice to answer<br>in <span style="background:linear-gradient(120deg,#FF6B1A,#FF8533,#FFB266);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent">under 1.5 seconds.</span></h1>
+  <p>Scroll to watch the ARGES glasses come alive. Each step shows exactly what happens inside the device — from wake word to spoken answer.</p>
+  <div class="scroll-cue"><span>SCROLL TO EXPLORE</span><div class="line"></div></div>
+</section>
+
+<!-- SCROLL 3D SECTION -->
+<section class="scroll-3d" id="scroll3d">
+  <div class="scroll-sticky">
+    <!-- LEFT: 3D Canvas -->
+    <div class="scroll-canvas-wrap">
+      <div class="scroll-canvas" id="scrollCanvas"></div>
+      <div class="canvas-badge badge-1" id="badge1"><span class="dot"></span><div><div class="l">Wake Word</div><div class="v">"ARGES"</div></div></div>
+      <div class="canvas-badge badge-2" id="badge2"><span class="dot"></span><div><div class="l">Camera</div><div class="v">Capturing</div></div></div>
+      <div class="canvas-badge badge-3" id="badge3"><span class="dot"></span><div><div class="l">AI Engine</div><div class="v">Processing</div></div></div>
+      <div class="canvas-badge badge-4" id="badge4"><span class="dot"></span><div><div class="l">Translation</div><div class="v">Bhashini</div></div></div>
+      <div class="canvas-badge badge-5" id="badge5"><span class="dot"></span><div><div class="l">Speaker</div><div class="v">Speaking</div></div></div>
+    </div>
+    <!-- RIGHT: Steps -->
+    <div class="scroll-steps">
+      <div class="step active" data-step="0">
+        <div class="step-num">/ STEP 01</div>
+        <h2>"ARGES, read this sign."</h2>
+        <p>The user says the wake word. The microphone array detects "ARGES" locally using Porcupine — completely offline, using less than 3.5% CPU. No cloud round-trip needed.</p>
+        <div class="step-tech">Porcupine · Offline · &lt;3.5% CPU</div>
+      </div>
+      <div class="step" data-step="1">
+        <div class="step-num">/ STEP 02</div>
+        <h2>Intent parsed.</h2>
+        <p>The word "read" triggers OCR mode. The 1080p camera captures a frame of whatever is in front of the user — a signboard, a medicine label, a book page.</p>
+        <div class="step-tech">1080p Sony Sensor · 30fps</div>
+      </div>
+      <div class="step" data-step="2">
+        <div class="step-num">/ STEP 03</div>
+        <h2>Text extracted on-device.</h2>
+        <p>Tesseract OCR runs directly on the glasses — no internet needed. It reads the sign and extracts the text in milliseconds. The AI brain handles it all locally.</p>
+        <div class="step-tech">Tesseract · PaddleOCR · Edge AI</div>
+      </div>
+      <div class="step" data-step="3">
+        <div class="step-num">/ STEP 04</div>
+        <h2>Translated to your language.</h2>
+        <p>If needed, the text is sent to Bhashini cloud for translation into one of 32+ Indian languages — Hindi, Tamil, Telugu, Marathi, Bengali, and more.</p>
+        <div class="step-tech">Bhashini · 32+ Languages</div>
+      </div>
+      <div class="step" data-step="4">
+        <div class="step-num">/ STEP 05</div>
+        <h2>Spoken aloud.</h2>
+        <p>The bone-conduction speaker delivers the answer directly into the user's ear — without blocking outside sounds. The HapticBand vibrates to confirm the task is complete.</p>
+        <div class="step-tech">Bone Conduction · Haptic Confirm</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- OUTRO -->
+<section class="outro">
+  <div class="outro-card">
+    <h2>That's <span style="background:linear-gradient(120deg,#FF6B1A,#FF8533);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent">ARGES.</span></h2>
+    <p>Voice in. Answer out. Under 1.5 seconds. Fully offline core AI. Built for India.</p>
+    <a href="index.html#cta"><button class="btn-primary">Get ARGES →</button></a>
+    <a href="index.html"><button class="btn-ghost">Back to Home</button></a>
+  </div>
+</section>
+
+<!-- THREE.JS — Scroll-Driven 3D -->
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"
+}}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
+
+const container = document.getElementById('scrollCanvas');
+const w = () => container.clientWidth;
+const h = () => container.clientHeight;
+
+const renderer = new THREE.WebGLRenderer({ antialias:true, alpha:true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setSize(w(), h());
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.1;
+container.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(35, w()/h(), 0.1, 100);
+camera.position.set(0, 0, 5);
+
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+
+// Lights
+const key = new THREE.DirectionalLight(0xFF8533, 2.5); key.position.set(3,4,5); scene.add(key);
+const fill = new THREE.DirectionalLight(0x6688FF, 0.8); fill.position.set(-4,-2,3); scene.add(fill);
+const rim = new THREE.DirectionalLight(0xFFFFFF, 1.5); rim.position.set(0,3,-5); scene.add(rim);
+
+// Load model
+let model = null;
+const loader = new GLTFLoader();
+loader.setMeshoptDecoder(MeshoptDecoder);
+loader.load('models/arges_glasses.glb', (gltf) => {
+  model = gltf.scene;
+  const box = new THREE.Box3().setFromObject(model);
+  const size = box.getSize(new THREE.Vector3());
+  const center = box.getCenter(new THREE.Vector3());
+  const maxDim = Math.max(size.x, size.y, size.z);
+  const scale = 2.8 / maxDim;
+  model.scale.setScalar(scale);
+  model.position.sub(center.multiplyScalar(scale));
+  scene.add(model);
+}, undefined, (err) => console.error('Model error:', err));
+
+// Controls (optional drag)
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = 0.1;
+controls.enableZoom = false;
+controls.enablePan = false;
+
+window.addEventListener('resize', () => {
+  camera.aspect = w()/h();
+  camera.updateProjectionMatrix();
+  renderer.setSize(w(), h());
+});
+
+// ---------- SCROLL LOGIC ----------
+const scroll3d = document.getElementById('scroll3d');
+const steps = document.querySelectorAll('.step');
+const dots = document.querySelectorAll('.progress-dot');
+const progressFillEl = document.getElementById('progressFill');
+const badges = [
+  document.getElementById('badge1'),
+  document.getElementById('badge2'),
+  document.getElementById('badge3'),
+  document.getElementById('badge4'),
+  document.getElementById('badge5'),
+];
+const NUM_STEPS = 5;
+
+function updateScroll() {
+  const rect = scroll3d.getBoundingClientRect();
+  const total = scroll3d.offsetHeight - window.innerHeight;
+  const scrolled = Math.max(0, -rect.top);
+  const progress = Math.min(1, Math.max(0, scrolled / total));
+
+  // Update progress bar
+  progressFillEl.style.height = (progress * 100) + '%';
+
+  // Determine current step
+  const stepProgress = progress * NUM_STEPS;
+  const currentStep = Math.min(NUM_STEPS - 1, Math.floor(stepProgress));
+  const stepFraction = stepProgress - currentStep; // 0-1 within current step
+
+  // Update step text
+  steps.forEach((s, i) => {
+    s.classList.toggle('active', i === currentStep);
+  });
+
+  // Update progress dots
+  dots.forEach((d, i) => {
+    d.classList.remove('active', 'done');
+    if (i < currentStep) d.classList.add('done');
+    else if (i === currentStep) d.classList.add('active');
+  });
+
+  // Update floating badges
+  badges.forEach((b, i) => {
+    b.classList.toggle('show', i === currentStep);
+  });
+
+  // ---------- 3D MODEL ROTATION (scroll-driven) ----------
+  if (model) {
+    // Rotate full 360° across all 5 steps
+    model.rotation.y = progress * Math.PI * 2;
+    // Tilt slightly per step (creates a "showcasing" feel)
+    model.rotation.x = Math.sin(progress * Math.PI) * 0.15;
+    // Lift up slightly in the middle
+    model.position.y = Math.sin(progress * Math.PI) * 0.2;
+    // Scale slightly bigger in the middle
+    const baseScale = model.scale.x;
+    // (don't change scale mid-flight — keep it stable)
+  }
+}
+
+window.addEventListener('scroll', updateScroll, { passive: true });
+updateScroll(); // initial
+
+// ---------- RENDER LOOP ----------
+function animate() {
+  requestAnimationFrame(animate);
+  controls.update();
+  renderer.render(scene, camera);
+}
+animate();
+</script>
+</body>
+</html>

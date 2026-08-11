@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ARGES — Spatial UI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=Hanken+Grotesk:wght@300;400;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   ARGES — SPATIAL UI (visionOS / Apple Vision Pro aesthetic)
+   Floating glass panels · 3D depth · parallax · layered z-space
+   ============================================================ */
+:root{
+  --bg-1:#000008; --bg-2:#050510; --bg-3:#0A0A18;
+  --glass:rgba(255,255,255,0.07);
+  --glass-hi:rgba(255,255,255,0.12);
+  --glass-border:rgba(255,255,255,0.16);
+  --glass-border-hi:rgba(255,255,255,0.28);
+  --orange:#FF6B1A; --orange-bright:#FF8533; --orange-glow:rgba(255,107,26,0.4);
+  --orange-rgb:255,107,26;
+  --white:#fff; --muted:#9999AA; --muted-2:#555566;
+  --shadow-spatial:0 24px 80px rgba(0,0,0,0.7),0 8px 24px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.15),inset 0 -1px 0 rgba(0,0,0,0.3);
+  --shadow-float:0 50px 140px rgba(0,0,0,0.8),0 20px 50px rgba(0,0,0,0.6),inset 0 1px 0 rgba(255,255,255,0.2),inset 0 -1px 0 rgba(0,0,0,0.4);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg-1);
+  color:var(--white);
+  font-family:'Hanken Grotesk',sans-serif;
+  overflow-x:hidden;
+  cursor:none;
+  /* Spatial ambient background — colorful gradient so glass has something to refract */
+  background:
+    radial-gradient(ellipse 60% 50% at 15% 5%,rgba(255,107,26,0.12),transparent 60%),
+    radial-gradient(ellipse 50% 40% at 85% 25%,rgba(80,40,200,0.08),transparent 60%),
+    radial-gradient(ellipse 70% 60% at 50% 90%,rgba(255,107,26,0.08),transparent 60%),
+    radial-gradient(ellipse 40% 30% at 90% 70%,rgba(200,60,100,0.06),transparent 60%),
+    var(--bg-1);
+  background-attachment:fixed;
+}
+::selection{background:var(--orange);color:#000}
+a{color:inherit;text-decoration:none}
+
+/* ==================== SPATIAL CURSOR ==================== */
+.cursor-dot,.cursor-ring{position:fixed;top:0;left:0;pointer-events:none;z-index:99999;border-radius:50%;transform:translate(-50%,-50%);mix-blend-mode:difference}
+.cursor-dot{width:6px;height:6px;background:#fff}
+.cursor-ring{width:32px;height:32px;border:1px solid rgba(255,255,255,0.4);transition:width .3s,height .3s,border-color .3s,background .3s}
+.cursor-ring.hover{width:80px;height:80px;border-color:var(--orange);background:rgba(255,107,26,0.06)}
+@media(max-width:768px){.cursor-dot,.cursor-ring{display:none}body{cursor:auto}}
+
+/* ==================== SPATIAL GLASS PANEL ==================== */
+/* This is the core visionOS element — floating frosted glass with depth */
+.glass-panel{
+  background:var(--glass);
+  backdrop-filter:blur(40px) saturate(1.5);
+  -webkit-backdrop-filter:blur(40px) saturate(1.5);
+  border:0.5px solid var(--glass-border);
+  border-radius:32px;
+  box-shadow:var(--shadow-spatial);
+  position:relative;
+  transform-style:preserve-3d;
+  transition:transform .6s cubic-bezier(0.16,1,0.3,1),box-shadow .6s,border-color .6s;
+}
+.glass-panel:hover{
+  border-color:var(--glass-border-hi);
+  box-shadow:var(--shadow-float);
+}
+/* Specular highlight — the glass reflection at top edge */
+.glass-panel::before{
+  content:'';
+  position:absolute;
+  top:0;left:0;right:0;
+  height:50%;
+  border-radius:32px 32px 0 0;
+  background:linear-gradient(180deg,rgba(255,255,255,0.06),transparent);
+  pointer-events:none;
+}
+
+/* ==================== FLOATING BG ORBS (spatial depth) ==================== */
+.orb{position:fixed;border-radius:50%;pointer-events:none;z-index:0;filter:blur(40px)}
+.orb-1{width:600px;height:600px;background:radial-gradient(circle,rgba(255,107,26,0.18),transparent 65%);top:-10%;left:-5%;animation:orbFloat1 20s ease-in-out infinite}
+.orb-2{width:500px;height:500px;background:radial-gradient(circle,rgba(80,40,200,0.10),transparent 65%);top:40%;right:-5%;animation:orbFloat2 25s ease-in-out infinite}
+.orb-3{width:550px;height:550px;background:radial-gradient(circle,rgba(255,107,26,0.12),transparent 65%);bottom:-10%;left:30%;animation:orbFloat1 18s ease-in-out infinite reverse}
+@keyframes orbFloat1{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(60px,80px) scale(1.1)}}
+@keyframes orbFloat2{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-80px,40px) scale(0.9)}}
+
+/* ==================== SPATIAL NAVBAR (floating pill) ==================== */
+.nav{
+  position:fixed;
+  top:24px;left:50%;
+  transform:translateX(-50%);
+  z-index:1000;
+  display:flex;align-items:center;justify-content:space-between;
+  width:calc(100% - 60px);max-width:1100px;
+  padding:10px 10px 10px 24px;
+  border-radius:999px;
+  background:rgba(10,10,20,0.35);
+  backdrop-filter:blur(60px) saturate(1.8);
+  -webkit-backdrop-filter:blur(60px) saturate(1.8);
+  border:0.5px solid var(--glass-border);
+  box-shadow:0 16px 50px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.08);
+  transition:all .6s cubic-bezier(0.16,1,0.3,1);
+}
+.nav.scrolled{
+  background:rgba(5,5,15,0.6);
+  backdrop-filter:blur(80px) saturate(2);
+  -webkit-backdrop-filter:blur(80px) saturate(2);
+  border-color:var(--glass-border-hi);
+  box-shadow:0 20px 60px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.12);
+  transform:translateX(-50%) translateY(-4px);
+}
+.nav-logo{display:flex;align-items:center;gap:10px;font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:1.15rem}
+.nav-logo svg{width:26px;height:26px;filter:drop-shadow(0 0 8px var(--orange-glow))}
+.nav-links{display:flex;gap:28px}
+.nav-links a{color:rgba(255,255,255,0.7);font-size:0.85rem;transition:color .3s}
+.nav-links a:hover{color:#fff}
+.nav-cta{
+  background:var(--orange);color:#000;
+  padding:10px 22px;border-radius:999px;
+  font-size:0.83rem;font-weight:600;
+  transition:all .4s;position:relative;overflow:hidden;
+  box-shadow:0 4px 16px var(--orange-glow);
+}
+.nav-cta:hover{transform:scale(1.05);box-shadow:0 8px 28px var(--orange-glow)}
+@media(max-width:820px){.nav-links{display:none}}
+
+/* ==================== HERO (spatial depth scene) ==================== */
+.hero{
+  min-height:100vh;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;padding:140px 24px 80px;
+  position:relative;z-index:1;
+  perspective:1200px;
+}
+.hero-eyebrow{
+  font-family:'JetBrains Mono',monospace;
+  font-size:0.72rem;letter-spacing:0.3em;text-transform:uppercase;
+  color:var(--orange);margin-bottom:40px;
+  opacity:0;animation:fadeUp .8s .5s forwards;
+}
+.hero-title{
+  font-family:'Bricolage Grotesque',sans-serif;
+  font-weight:800;
+  font-size:clamp(3rem,10vw,8rem);
+  line-height:0.88;letter-spacing:-0.04em;
+}
+.hero-title .ln{display:block;overflow:hidden}
+.hero-title .ln>span{display:inline-block;transform:translateY(110%);animation:lineUp 1.2s cubic-bezier(0.16,1,0.3,1) forwards}
+.hero-title .ln:nth-child(1)>span{animation-delay:.3s}
+.hero-title .ln:nth-child(2)>span{animation-delay:.5s}
+.hero-title .ln:nth-child(3)>span{animation-delay:.7s}
+.hero-title .ln:nth-child(4)>span{animation-delay:.9s}
+@keyframes lineUp{to{transform:translateY(0)}}
+.grad-text{background:linear-gradient(120deg,#FF6B1A,#FF8533,#FFB266,#FF8533,#FF6B1A);background-size:300% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:gradFlow 5s linear infinite}
+@keyframes gradFlow{to{background-position:300% 50%}}
+.hero-greek{font-family:'Instrument Serif',serif;font-style:italic;font-size:1.4rem;color:var(--orange);margin:24px 0 8px;opacity:0;animation:fadeUp .8s 1.2s forwards}
+.hero-sub{max-width:560px;color:var(--muted);font-size:1.05rem;line-height:1.65;margin:28px auto 44px;opacity:0;animation:fadeUp .8s 1.3s forwards}
+.hero-cta{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;opacity:0;animation:fadeUp .8s 1.4s forwards}
+.btn-primary{
+  background:var(--orange);color:#000;
+  padding:16px 38px;border-radius:999px;
+  font-weight:600;font-size:0.92rem;border:none;
+  display:inline-flex;align-items:center;gap:8px;
+  transition:all .4s cubic-bezier(0.16,1,0.3,1);
+  box-shadow:0 8px 32px var(--orange-glow);
+  cursor:none;position:relative;overflow:hidden;
+}
+.btn-primary::before{content:'';position:absolute;inset:0;background:linear-gradient(120deg,transparent,rgba(255,255,255,0.4),transparent);transform:translateX(-100%);transition:transform .6s}
+.btn-primary:hover::before{transform:translateX(100%)}
+.btn-primary:hover{transform:translateY(-4px) scale(1.02);box-shadow:0 16px 48px var(--orange-glow)}
+.btn-ghost{
+  background:var(--glass);color:#fff;
+  padding:16px 38px;border-radius:999px;
+  font-weight:500;font-size:0.92rem;
+  border:0.5px solid var(--glass-border-hi);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  display:inline-flex;align-items:center;gap:8px;
+  transition:all .4s;cursor:none;
+}
+.btn-ghost:hover{background:var(--glass-hi);border-color:rgba(255,255,255,0.35);transform:translateY(-4px)}
+.hero-meta{margin-top:64px;display:flex;gap:56px;flex-wrap:wrap;justify-content:center;opacity:0;animation:fadeUp .8s 1.6s forwards}
+.hero-meta-num{font-family:'Instrument Serif',serif;font-style:italic;font-size:2.2rem;color:var(--orange)}
+.hero-meta-lbl{font-size:0.66rem;color:var(--muted);letter-spacing:0.18em;text-transform:uppercase;margin-top:4px}
+@keyframes fadeUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+
+/* ==================== FLOATING HERO CARD (spatial showcase) ==================== */
+.hero-float-card{
+  position:absolute;
+  background:var(--glass);
+  backdrop-filter:blur(30px) saturate(1.5);
+  -webkit-backdrop-filter:blur(30px) saturate(1.5);
+  border:0.5px solid var(--glass-border-hi);
+  border-radius:20px;
+  padding:14px 20px;
+  box-shadow:var(--shadow-spatial);
+  font-size:0.8rem;
+  display:flex;align-items:center;gap:10px;
+  animation:floatCard 6s ease-in-out infinite;
+  z-index:2;
+}
+.hero-float-card .icon{width:32px;height:32px;border-radius:10px;background:rgba(255,107,26,0.12);display:flex;align-items:center;justify-content:center;border:0.5px solid rgba(255,107,26,0.2)}
+.hero-float-card .icon svg{width:18px;height:18px;stroke:var(--orange);fill:none;stroke-width:1.5}
+.hero-float-card .lbl{font-size:0.66rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em}
+.hero-float-card .val{font-weight:600;font-size:0.88rem}
+.float-1{top:18%;left:8%;animation-delay:0s}
+.float-2{top:65%;left:12%;animation-delay:-2s}
+.float-3{top:20%;right:8%;animation-delay:-4s}
+.float-4{top:70%;right:10%;animation-delay:-3s}
+@keyframes floatCard{0%,100%{transform:translateY(0) rotateX(0)}50%{transform:translateY(-20px) rotateX(5deg)}}
+@media(max-width:900px){.hero-float-card{display:none}}
+
+/* ==================== 3D MODEL CANVAS (hero showcase) ==================== */
+.hero-3d{
+  position:absolute;
+  top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  width:600px;height:600px;
+  z-index:1;
+  pointer-events:auto;
+}
+.hero-3d canvas{width:100%!important;height:100%!important;cursor:grab}
+.hero-3d canvas:active{cursor:grabbing}
+@media(max-width:900px){.hero-3d{width:90vw;height:50vh;top:35%}}
+.hero-text-wrap{position:relative;z-index:2;pointer-events:none}
+.hero-text-wrap .hero-cta,.hero-text-wrap .hero-cta a{pointer-events:auto}
+
+/* ==================== SECTION SHELL ==================== */
+section{padding:160px 5vw;position:relative;z-index:1}
+.container{max-width:1280px;margin:0 auto;position:relative;z-index:1}
+.section-head{margin-bottom:80px;max-width:900px}
+.label{font-family:'JetBrains Mono',monospace;font-size:0.72rem;letter-spacing:0.24em;text-transform:uppercase;color:var(--orange);display:block;margin-bottom:22px}
+.section-title{font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:clamp(2.2rem,4.8vw,4.2rem);letter-spacing:-0.035em;line-height:1}
+.section-intro{color:var(--muted);font-size:1.02rem;max-width:560px;margin-top:28px;line-height:1.7}
+
+/* ==================== ECOSYSTEM (spatial cards floating at different depths) ==================== */
+.layers{display:grid;grid-template-columns:repeat(5,1fr);gap:20px;perspective:1000px}
+.layer-card{
+  padding:38px 26px;
+  border-radius:28px;
+  background:var(--glass);
+  backdrop-filter:blur(40px) saturate(1.5);
+  -webkit-backdrop-filter:blur(40px) saturate(1.5);
+  border:0.5px solid var(--glass-border);
+  box-shadow:var(--shadow-spatial);
+  transition:all .6s cubic-bezier(0.16,1,0.3,1);
+  position:relative;overflow:hidden;
+  min-height:320px;display:flex;flex-direction:column;
+  transform-style:preserve-3d;
+  /* Each card floats at a slightly different depth */
+}
+.layer-card:nth-child(1){transform:translateZ(-20px)}
+.layer-card:nth-child(2){transform:translateZ(0)}
+.layer-card:nth-child(3){transform:translateZ(20px)}
+.layer-card:nth-child(4){transform:translateZ(0)}
+.layer-card:nth-child(5){transform:translateZ(-20px)}
+.layer-card:hover{
+  transform:translateY(-16px) translateZ(40px) scale(1.03);
+  border-color:rgba(255,107,26,0.3);
+  box-shadow:0 40px 100px rgba(0,0,0,0.6),0 0 40px rgba(255,107,26,0.08),inset 0 1px 0 rgba(255,255,255,0.12);
+}
+.layer-card::before{content:'';position:absolute;top:0;left:0;right:0;height:50%;border-radius:28px 28px 0 0;background:linear-gradient(180deg,rgba(255,255,255,0.05),transparent);pointer-events:none}
+.layer-num{font-family:'JetBrains Mono',monospace;font-size:0.72rem;color:var(--orange);margin-bottom:26px}
+.layer-icon{width:52px;height:52px;border-radius:14px;background:rgba(255,107,26,0.08);border:0.5px solid rgba(255,107,26,0.2);display:flex;align-items:center;justify-content:center;margin-bottom:26px;transition:transform .4s}
+.layer-card:hover .layer-icon{transform:scale(1.15)}
+.layer-icon svg{width:24px;height:24px;stroke:var(--orange);fill:none;stroke-width:1.5}
+.layer-title{font-family:'Bricolage Grotesque',sans-serif;font-weight:600;font-size:1.08rem;margin-bottom:12px}
+.layer-desc{font-size:0.84rem;color:var(--muted);line-height:1.6}
+@media(max-width:1024px){.layers{grid-template-columns:repeat(2,1fr)}.layer-card,.layer-card:nth-child(n){transform:none}}
+@media(max-width:540px){.layers{grid-template-columns:1fr}}
+
+/* ==================== FEATURES (spatial grid with spotlight) ==================== */
+.features{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;perspective:1000px}
+.feature{
+  padding:44px 32px;
+  border-radius:28px;
+  background:var(--glass);
+  backdrop-filter:blur(30px) saturate(1.4);
+  -webkit-backdrop-filter:blur(30px) saturate(1.4);
+  border:0.5px solid var(--glass-border);
+  box-shadow:var(--shadow-spatial);
+  transition:all .5s cubic-bezier(0.16,1,0.3,1);
+  position:relative;overflow:hidden;min-height:240px;
+  transform-style:preserve-3d;--mx:50%;--my:50%;
+}
+.feature::before{content:'';position:absolute;top:0;left:0;right:0;height:50%;border-radius:28px 28px 0 0;background:linear-gradient(180deg,rgba(255,255,255,0.04),transparent);pointer-events:none;z-index:0}
+.feature::after{content:'';position:absolute;inset:0;background:radial-gradient(circle 250px at var(--mx) var(--my),rgba(255,107,26,0.1),transparent 70%);opacity:0;transition:opacity .5s;pointer-events:none;z-index:0}
+.feature:hover::after{opacity:1}
+.feature:hover{transform:translateY(-12px) translateZ(30px);border-color:var(--glass-border-hi);box-shadow:var(--shadow-float)}
+.feature>*{position:relative;z-index:1}
+.feature-icon{width:44px;height:44px;margin-bottom:26px}
+.feature-icon svg{width:100%;height:100%;stroke:var(--orange);fill:none;stroke-width:1.5}
+.feature-name{font-family:'Bricolage Grotesque',sans-serif;font-weight:600;font-size:1.05rem;margin-bottom:10px}
+.feature-desc{font-size:0.82rem;color:var(--muted);line-height:1.6}
+.feature-num{position:absolute;top:26px;right:30px;font-family:'JetBrains Mono',monospace;font-size:0.68rem;color:var(--muted-2);z-index:1}
+@media(max-width:1024px){.features{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:540px){.features{grid-template-columns:1fr}}
+
+/* ==================== PRICING (floating spatial tiers) ==================== */
+.pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;perspective:1000px;align-items:start}
+.price-card{
+  padding:48px 38px;border-radius:32px;
+  background:var(--glass);
+  backdrop-filter:blur(40px) saturate(1.5);
+  -webkit-backdrop-filter:blur(40px) saturate(1.5);
+  border:0.5px solid var(--glass-border);
+  box-shadow:var(--shadow-spatial);
+  position:relative;
+  transition:all .6s cubic-bezier(0.16,1,0.3,1);
+  display:flex;flex-direction:column;overflow:hidden;
+  transform-style:preserve-3d;--mx:50%;--my:50%;
+}
+.price-card::before{content:'';position:absolute;top:0;left:0;right:0;height:50%;border-radius:32px 32px 0 0;background:linear-gradient(180deg,rgba(255,255,255,0.05),transparent);pointer-events:none;z-index:0}
+.price-card::after{content:'';position:absolute;inset:0;background:radial-gradient(circle 300px at var(--mx) var(--my),rgba(255,107,26,0.08),transparent 70%);opacity:0;transition:opacity .5s;pointer-events:none;z-index:0}
+.price-card:hover::after{opacity:1}
+.price-card:hover{transform:translateY(-16px) translateZ(40px);border-color:var(--glass-border-hi);box-shadow:var(--shadow-float)}
+.price-card.featured{
+  background:rgba(255,107,26,0.06);
+  border-color:rgba(255,107,26,0.3);
+  transform:translateZ(20px) scale(1.02);
+  box-shadow:0 30px 90px rgba(0,0,0,0.5),0 0 60px rgba(255,107,26,0.1),inset 0 1px 0 rgba(255,255,255,0.1);
+}
+.price-card.featured:hover{transform:translateY(-16px) translateZ(50px) scale(1.04)}
+.price-card>*{position:relative;z-index:1}
+.price-badge{position:absolute;top:-14px;left:50%;transform:translateX(-50%);background:var(--orange);color:#000;padding:6px 18px;border-radius:999px;font-size:0.68rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;z-index:3;box-shadow:0 4px 16px var(--orange-glow)}
+.price-tier{font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--muted);letter-spacing:0.16em;text-transform:uppercase;margin-bottom:16px}
+.price-amt{font-family:'Instrument Serif',serif;font-style:italic;font-size:3rem;margin-bottom:6px}
+.price-amt.orange{color:var(--orange)}
+.price-per{font-size:0.78rem;color:var(--muted);margin-bottom:30px}
+.price-feats{list-style:none;margin-bottom:32px;flex-grow:1}
+.price-feats li{font-size:0.87rem;color:rgba(255,255,255,0.82);padding:12px 0;border-bottom:0.5px solid rgba(255,255,255,0.06);display:flex;align-items:center;gap:12px}
+.price-feats li::before{content:'';width:14px;height:1px;background:var(--orange);flex-shrink:0}
+.price-btn{display:block;text-align:center;padding:15px;border-radius:999px;font-weight:600;font-size:0.88rem;transition:all .3s;cursor:none}
+.price-btn.solid{background:var(--orange);color:#000}
+.price-btn.solid:hover{box-shadow:0 8px 28px var(--orange-glow);transform:translateY(-2px)}
+.price-btn.outline{border:0.5px solid var(--glass-border-hi);color:#fff}
+.price-btn.outline:hover{background:var(--glass-hi)}
+@media(max-width:900px){.pricing-grid{grid-template-columns:1fr}.price-card,.price-card.featured{transform:none}}
+
+/* ==================== FAQ (spatial accordion) ==================== */
+.faq-list{max-width:860px;margin:0 auto}
+.faq-item{
+  padding:30px 0;cursor:pointer;
+  border-bottom:0.5px solid rgba(255,255,255,0.06);
+  transition:padding-left .3s;
+}
+.faq-item:hover{padding-left:16px}
+.faq-q{display:flex;justify-content:space-between;align-items:center;font-size:1.08rem;font-weight:500;font-family:'Bricolage Grotesque',sans-serif}
+.faq-icon{width:32px;height:32px;border-radius:50%;border:0.5px solid var(--glass-border-hi);display:flex;align-items:center;justify-content:center;transition:all .3s;flex-shrink:0;position:relative;background:var(--glass)}
+.faq-icon::before,.faq-icon::after{content:'';position:absolute;background:var(--orange);transition:transform .3s}
+.faq-icon::before{width:12px;height:1px}
+.faq-icon::after{width:1px;height:12px}
+.faq-item.open .faq-icon{background:rgba(255,107,26,0.1);border-color:var(--orange);transform:rotate(90deg)}
+.faq-item.open .faq-icon::after{transform:scaleY(0)}
+.faq-a{max-height:0;overflow:hidden;color:var(--muted);font-size:0.93rem;line-height:1.65;transition:max-height .5s cubic-bezier(0.16,1,0.3,1),margin .5s}
+.faq-item.open .faq-a{max-height:240px;margin-top:18px}
+
+/* ==================== CTA (floating spatial panel) ==================== */
+.cta-section{text-align:center;padding:180px 5vw}
+.cta-card{
+  max-width:920px;margin:0 auto;padding:100px 44px;border-radius:40px;
+  background:radial-gradient(circle at 50% 0%,rgba(255,107,26,0.12),transparent 60%),var(--glass);
+  backdrop-filter:blur(50px) saturate(1.6);
+  -webkit-backdrop-filter:blur(50px) saturate(1.6);
+  border:0.5px solid var(--glass-border-hi);
+  box-shadow:0 40px 120px rgba(0,0,0,0.6),0 0 80px rgba(255,107,26,0.06),inset 0 1px 0 rgba(255,255,255,0.12);
+  position:relative;overflow:hidden;
+}
+.cta-card h2{font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:clamp(2.2rem,4.8vw,3.8rem);letter-spacing:-0.035em;line-height:1;margin-bottom:22px}
+.cta-card p{color:var(--muted);margin-bottom:42px;font-size:1.05rem}
+
+/* ==================== FOOTER ==================== */
+footer{background:rgba(5,5,12,0.6);backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px);border-top:0.5px solid var(--glass-border);padding:80px 5vw 40px;position:relative;z-index:1}
+.footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:60px;max-width:1280px;margin:0 auto 60px}
+.footer-brand h3{font-family:'Bricolage Grotesque',sans-serif;font-size:1.8rem;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:12px}
+.footer-brand h3 .dot{width:8px;height:8px;border-radius:50%;background:var(--orange);box-shadow:0 0 12px var(--orange-glow)}
+.footer-brand p{color:var(--muted);font-size:0.88rem;max-width:340px;line-height:1.65}
+.footer-col h4{font-family:'JetBrains Mono',monospace;font-size:0.7rem;letter-spacing:0.22em;text-transform:uppercase;color:var(--orange);margin-bottom:22px}
+.footer-col a{display:block;color:var(--muted);font-size:0.88rem;padding:7px 0;transition:color .25s,padding-left .25s}
+.footer-col a:hover{color:#fff;padding-left:6px}
+.footer-bottom{max-width:1280px;margin:0 auto;padding-top:34px;border-top:0.5px solid rgba(255,255,255,0.06);display:flex;justify-content:space-between;align-items:center;font-size:0.78rem;color:var(--muted-2);flex-wrap:wrap;gap:16px}
+@media(max-width:768px){.footer-grid{grid-template-columns:1fr 1fr;gap:44px}}
+
+/* ==================== SCROLL REVEAL ==================== */
+.reveal{opacity:0;transform:translateY(50px);transition:opacity 1s cubic-bezier(0.16,1,0.3,1),transform 1s cubic-bezier(0.16,1,0.3,1)}
+.reveal.in{opacity:1;transform:translateY(0)}
+</style>
+</head>
+<body>
+
+<!-- SPATIAL BG ORBS -->
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
+
+<!-- CURSOR -->
+<div class="cursor-dot" id="cursorDot"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- NAV -->
+<nav class="nav" id="nav">
+  <a href="#" class="nav-logo">
+    <svg viewBox="0 0 100 100"><path d="M50 28 C28 28 14 50 14 50 C14 50 28 72 50 72 C72 72 86 50 86 50 C86 50 72 28 50 28 Z" stroke="#FF6B1A" stroke-width="3" fill="none"/><circle cx="50" cy="50" r="9" stroke="#FF6B1A" stroke-width="3" fill="none"/><circle cx="50" cy="50" r="3.5" fill="#FF6B1A"/></svg>
+    ARGES
+  </a>
+  <div class="nav-links">
+    <a href="#ecosystem">Ecosystem</a><a href="#features">Features</a><a href="#pricing">Pricing</a><a href="#faq">FAQ</a>
+  </div>
+  <a href="#cta" class="nav-cta">Get ARGES</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <!-- 3D MODEL (Three.js renders the GLB here) -->
+  <div class="hero-3d" id="hero3d"></div>
+
+  <!-- Floating spatial info cards -->
+  <div class="hero-float-card float-1">
+    <div class="icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/></svg></div>
+    <div><div class="lbl">AI Vision</div><div class="val">Active</div></div>
+  </div>
+  <div class="hero-float-card float-2">
+    <div class="icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>
+    <div><div class="lbl">Family</div><div class="val">Connected</div></div>
+  </div>
+  <div class="hero-float-card float-3">
+    <div class="icon"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+    <div><div class="lbl">Privacy</div><div class="val">E2EE Locked</div></div>
+  </div>
+  <div class="hero-float-card float-4">
+    <div class="icon"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div>
+    <div><div class="lbl">Live GPS</div><div class="val">Streaming</div></div>
+  </div>
+
+  <div class="hero-text-wrap">
+  <div class="hero-eyebrow">Spatial AI Vision Ecosystem</div>
+  <h1 class="hero-title">
+    <span class="ln"><span>Forging</span></span>
+    <span class="ln"><span class="grad-text">Light.</span></span>
+    <span class="ln"><span>Empowering</span></span>
+    <span class="ln"><span class="grad-text">Sight.</span></span>
+  </h1>
+  <div class="hero-greek">Ἄργης · "The Bright One"</div>
+  <p class="hero-sub">A five-layer AI vision ecosystem that restores independence, safety, and dignity to the visually impaired — designed like a spatial computing platform, not a medical device.</p>
+  <div class="hero-cta">
+    <a href="3d.html" class="btn-primary">See How It Works →</a>
+    <a href="#ecosystem" class="btn-ghost">Explore Ecosystem</a>
+  </div>
+  <div class="hero-meta">
+    <div><div class="hero-meta-num">15M+</div><div class="hero-meta-lbl">Blind in India</div></div>
+    <div><div class="hero-meta-num">₹9,999</div><div class="hero-meta-lbl">Starting price</div></div>
+    <div><div class="hero-meta-num">8</div><div class="hero-meta-lbl">Industry firsts</div></div>
+    <div><div class="hero-meta-num">5</div><div class="hero-meta-lbl">Layer ecosystem</div></div>
+  </div>
+  </div>
+</section>
+
+<!-- ECOSYSTEM -->
+<section id="ecosystem">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="label">/ 01 — The Solution</span>
+      <h2 class="section-title">Not a gadget. <span class="grad-text">An ecosystem.</span></h2>
+      <p class="section-intro">Five spatial layers, floating in perfect harmony. Each builds on the one below — hardware, AI, family, devices, community. Move your cursor to feel the depth.</p>
+    </div>
+    <div class="layers reveal">
+      <div class="layer-card">
+        <div class="layer-num">/ 01</div>
+        <div class="layer-icon"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></div>
+        <div class="layer-title">Smart Vision</div>
+        <div class="layer-desc">Obstacle detection, scene description, navigation — including overhead hazards the cane misses.</div>
+      </div>
+      <div class="layer-card">
+        <div class="layer-num">/ 02</div>
+        <div class="layer-icon"><svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>
+        <div class="layer-title">Reading Intelligence</div>
+        <div class="layer-desc">OCR, currency recognition, product scanning, color detection. Reads the world aloud.</div>
+      </div>
+      <div class="layer-card">
+        <div class="layer-num">/ 03</div>
+        <div class="layer-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg></div>
+        <div class="layer-title">Family Guardian</div>
+        <div class="layer-desc">Live encrypted video, audio & GPS streamed to family. Talk back. SOS in one touch.</div>
+      </div>
+      <div class="layer-card">
+        <div class="layer-num">/ 04</div>
+        <div class="layer-icon"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div>
+        <div class="layer-title">OmniAccess</div>
+        <div class="layer-desc">Operate phone, laptop or tablet exactly like a sighted person. True equality.</div>
+      </div>
+      <div class="layer-card">
+        <div class="layer-num">/ 05</div>
+        <div class="layer-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
+        <div class="layer-title">Echo Network</div>
+        <div class="layer-desc">Community mesh shares hazards. Volunteer vision connects help in 5 seconds.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="label">/ 02 — Differentiators</span>
+      <h2 class="section-title">Eight things <span class="grad-text">no other glasses</span> can do.</h2>
+      <p class="section-intro">Each panel floats in its own spatial layer. Hover to illuminate — the spotlight follows your cursor through depth.</p>
+    </div>
+    <div class="features reveal">
+      <div class="feature"><div class="feature-num">/ 01</div><div class="feature-icon"><svg viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg></div><div class="feature-name">Family Connect</div><div class="feature-desc">Live encrypted video, audio & GPS from the glasses, streamed to family.</div></div>
+      <div class="feature"><div class="feature-num">/ 02</div><div class="feature-icon"><svg viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12" y2="18"/></svg></div><div class="feature-name">OmniAccess</div><div class="feature-desc">Operate phone, laptop or tablet exactly like a sighted person.</div></div>
+      <div class="feature"><div class="feature-num">/ 03</div><div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12" y2="20"/></svg></div><div class="feature-name">Echo Network</div><div class="feature-desc">Community mesh shares hazards; volunteers help in 5 seconds.</div></div>
+      <div class="feature"><div class="feature-num">/ 04</div><div class="feature-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg></div><div class="feature-name">Spatial Sound</div><div class="feature-desc">3D binaural beeps guide direction — just follow the sound.</div></div>
+      <div class="feature"><div class="feature-num">/ 05</div><div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div><div class="feature-name">Companion AI</div><div class="feature-desc">Detects stress and sadness; supports mental wellness.</div></div>
+      <div class="feature"><div class="feature-num">/ 06</div><div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M2 12h4"/><path d="M18 12h4"/><path d="M8 8v8"/><path d="M16 8v8"/><circle cx="12" cy="12" r="2"/></svg></div><div class="feature-name">HapticBand</div><div class="feature-desc">Directional vibration zones encode object and distance.</div></div>
+      <div class="feature"><div class="feature-num">/ 07</div><div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M10.5 20.5 3 12l3-3 7.5 7.5"/><path d="M9 11l4 4"/><path d="M21 9a9 9 0 0 0-9-9"/><path d="M16 4l4 4"/></svg></div><div class="feature-name">MediScan</div><div class="feature-desc">Reads labels, checks drug interactions, dosage reminders.</div></div>
+      <div class="feature"><div class="feature-num">/ 08</div><div class="feature-icon"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div><div class="feature-name">Zero-Knowledge</div><div class="feature-desc">AES-256 end-to-end encryption — even ARGES cannot decrypt your data.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="label">/ 03 — Pricing</span>
+      <h2 class="section-title">Independence shouldn't cost<br><span class="grad-text">a fortune.</span></h2>
+    </div>
+    <div class="pricing-grid reveal">
+      <div class="price-card">
+        <div class="price-tier">ARGES One</div>
+        <div class="price-amt">₹9,999</div>
+        <div class="price-per">one-time · glasses only</div>
+        <ul class="price-feats"><li>All standalone AI features</li><li>Lifetime offline AI</li><li>OCR · currency · faces</li><li>Wake-word voice assistant</li></ul>
+        <a href="#cta" class="price-btn outline">Get ARGES One</a>
+      </div>
+      <div class="price-card featured">
+        <div class="price-badge">Most Popular</div>
+        <div class="price-tier">ARGES Family</div>
+        <div class="price-amt orange">₹12,999</div>
+        <div class="price-per">one-time · glasses + band + cloud</div>
+        <ul class="price-feats"><li>Everything in ARGES One</li><li>HapticBand included</li><li>1-year cloud streaming</li><li>Family Guardian Dashboard</li><li>Echo Network access</li></ul>
+        <a href="#cta" class="price-btn solid">Get ARGES Family</a>
+      </div>
+      <div class="price-card">
+        <div class="price-tier">ARGES Care</div>
+        <div class="price-amt">₹49<span style="font-size:1rem;color:var(--muted)">/mo</span></div>
+        <div class="price-per">subscription · after year 1</div>
+        <ul class="price-feats"><li>Live streaming continuation</li><li>Echo Network</li><li>Software updates</li><li>Companion AI premium</li></ul>
+        <a href="#cta" class="price-btn outline">Add ARGES Care</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq">
+  <div class="container">
+    <div class="section-head reveal" style="text-align:center;margin:0 auto 70px;">
+      <span class="label" style="display:block;">/ 04 — Questions</span>
+      <h2 class="section-title" style="margin-top:20px">Frequently asked.</h2>
+    </div>
+    <div class="faq-list reveal">
+      <div class="faq-item"><div class="faq-q">Do I need internet for ARGES to work? <span class="faq-icon"></span></div><div class="faq-a">No — core AI (obstacle detection, OCR, currency, face recognition) runs on-device. The cloud is only used for language translation, family streaming, and the Echo Network.</div></div>
+      <div class="faq-item"><div class="faq-q">Is the family video stream private? <span class="faq-icon"></span></div><div class="faq-a">Yes — AES-256 end-to-end encryption via LiveKit SFrame. Even ARGES itself cannot decrypt your stream.</div></div>
+      <div class="faq-item"><div class="faq-q">How long does the battery last? <span class="faq-icon"></span></div><div class="faq-a">8+ hours with the 6000mAh battery. The solar charging strap trickle-charges during outdoor use.</div></div>
+      <div class="faq-item"><div class="faq-q">Can the user operate a phone or laptop? <span class="faq-icon"></span></div><div class="faq-a">Yes — ARGES OmniAccess provides sight-equivalent control via spoken and haptic feedback.</div></div>
+      <div class="faq-item"><div class="faq-q">Does it work in Indian languages? <span class="faq-icon"></span></div><div class="faq-a">Yes — 32+ Indian languages via Bhashini, including Hindi, Tamil, Telugu, Marathi, Bengali.</div></div>
+      <div class="faq-item"><div class="faq-q">What if the user falls? <span class="faq-icon"></span></div><div class="faq-a">The ADXL345 detects the fall (99.4% accuracy) and triggers Guardian SOS — sending live GPS, audio, and video to family.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section id="cta" class="cta-section">
+  <div class="cta-card reveal">
+    <h2>Ready to forge <span class="grad-text">light?</span></h2>
+    <p>Give independence. Give safety. Give dignity. Give ARGES.</p>
+    <div class="hero-cta" style="opacity:1;animation:none;justify-content:center">
+      <a href="#" class="btn-primary">Get ARGES →</a>
+      <a href="#" class="btn-ghost">Talk to us</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <h3><span class="dot"></span>ARGES</h3>
+      <p>Forging Light. Empowering Sight. — A spatial AI vision ecosystem for the visually impaired. Built in India, for 15 million+ who deserve independence.</p>
+    </div>
+    <div class="footer-col"><h4>Product</h4><a href="#ecosystem">Ecosystem</a><a href="#features">Features</a><a href="#pricing">Pricing</a><a href="#faq">FAQ</a></div>
+    <div class="footer-col"><h4>Family</h4><a href="#">Guardian Dashboard</a><a href="#">Login</a><a href="#">SOS Info</a><a href="#">Echo Network</a></div>
+    <div class="footer-col"><h4>Company</h4><a href="#">About</a><a href="#">Contact</a><a href="#">Privacy</a><a href="#">DPDP / GDPR</a></div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 ARGES · <span style="color:var(--orange)">Forging Light. Empowering Sight.</span></span>
+    <span>Made in India</span>
+  </div>
+</footer>
+
+<script>
+// Cursor
+const dot=document.getElementById('cursorDot'),ring=document.getElementById('cursorRing');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;dot.style.left=mx+'px';dot.style.top=my+'px'});
+(function a(){rx+=(mx-rx)*0.15;ry+=(my-ry)*0.15;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(a)})();
+document.querySelectorAll('a,.faq-item,.layer-card,.feature,.price-card,button').forEach(el=>{el.addEventListener('mouseenter',()=>ring.classList.add('hover'));el.addEventListener('mouseleave',()=>ring.classList.remove('hover'))});
+
+// Nav scroll
+const nav=document.getElementById('nav');
+window.addEventListener('scroll',()=>{if(window.scrollY>40)nav.classList.add('scrolled');else nav.classList.remove('scrolled')});
+
+// Scroll reveal
+const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}})},{threshold:0.12,rootMargin:'0px 0px -60px 0px'});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+// Spotlight on feature cards
+document.querySelectorAll('.feature,.price-card').forEach(card=>{
+  card.addEventListener('mousemove',e=>{
+    const r=card.getBoundingClientRect();
+    card.style.setProperty('--mx',(e.clientX-r.left)+'px');
+    card.style.setProperty('--my',(e.clientY-r.top)+'px');
+  });
+});
+
+// FAQ
+document.querySelectorAll('.faq-item').forEach(item=>{item.addEventListener('click',()=>{const w=item.classList.contains('open');document.querySelectorAll('.faq-item').forEach(i=>i.classList.remove('open'));if(!w)item.classList.add('open')})});
+
+// SPATIAL PARALLAX — mouse moves the orbs and floating cards in 3D space
+document.addEventListener('mousemove',e=>{
+  const cx=window.innerWidth/2,cy=window.innerHeight/2;
+  const dx=(e.clientX-cx)/cx,dy=(e.clientY-cy)/cy;
+  // Orbs move slightly (depth background)
+  document.querySelectorAll('.orb').forEach((orb,i)=>{
+    const depth=(i+1)*15;
+    orb.style.transform=`translate(${dx*depth}px,${dy*depth}px)`;
+  });
+  // Floating hero cards tilt with mouse (true spatial feel)
+  document.querySelectorAll('.hero-float-card').forEach((card,i)=>{
+    const depth=(i+1)*8;
+    card.style.transform=`translate(${dx*depth}px,${dy*depth}px)`;
+  });
+  // Ecosystem layer cards tilt as a group
+  document.querySelectorAll('.layer-card').forEach((card,i)=>{
+    if(window.innerWidth>1024){
+      const depth=(i-2)*4;
+      // Don't override hover transform — only subtle parallax
+    }
+  });
+});
+
+// SPATIAL TILT on layer cards (3D rotate toward cursor)
+document.querySelectorAll('.layer-card').forEach(card=>{
+  card.addEventListener('mousemove',e=>{
+    const r=card.getBoundingClientRect();
+    const px=(e.clientX-r.left)/r.width-0.5;
+    const py=(e.clientY-r.top)/r.height-0.5;
+    card.style.transform=`translateY(-16px) translateZ(40px) scale(1.03) perspective(800px) rotateY(${px*10}deg) rotateX(${-py*10}deg)`;
+  });
+  card.addEventListener('mouseleave',()=>{
+    const i=Array.from(card.parentNode.children).indexOf(card);
+    const zs=[-20,0,20,0,-20];
+    card.style.transform=`translateZ(${zs[i]||0}px)`;
+  });
+});
+</script>
+
+<!-- THREE.JS — 3D MODEL VIEWER (hero showcase) -->
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"
+}}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
+
+const container = document.getElementById('hero3d');
+if (container) {
+  const w = () => container.clientWidth;
+  const h = () => container.clientHeight;
+
+  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setSize(w(), h());
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.1;
+  container.appendChild(renderer.domElement);
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(35, w()/h(), 0.1, 100);
+  camera.position.set(0, 0, 5);
+
+  // Environment for nice reflections on glass/metal
+  const pmrem = new THREE.PMREMGenerator(renderer);
+  scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+
+  // Lights
+  const key = new THREE.DirectionalLight(0xFF8533, 2.5);
+  key.position.set(3, 4, 5); scene.add(key);
+  const fill = new THREE.DirectionalLight(0x6688FF, 0.8);
+  fill.position.set(-4, -2, 3); scene.add(fill);
+  const rim = new THREE.DirectionalLight(0xFFFFFF, 1.5);
+  rim.position.set(0, 3, -5); scene.add(rim);
+
+  // Load the GLB model
+  const loader = new GLTFLoader();
+  loader.setMeshoptDecoder(MeshoptDecoder);
+  let model = null;
+  loader.load('models/arges_glasses.glb', (gltf) => {
+    model = gltf.scene;
+    // Center and scale the model
+    const box = new THREE.Box3().setFromObject(model);
+    const size = box.getSize(new THREE.Vector3());
+    const center = box.getCenter(new THREE.Vector3());
+    const maxDim = Math.max(size.x, size.y, size.z);
+    const scale = 2.5 / maxDim;
+    model.scale.setScalar(scale);
+    model.position.sub(center.multiplyScalar(scale));
+    scene.add(model);
+    console.log('ARGES 3D model loaded');
+  }, (xhr) => {
+    console.log(`Loading 3D: ${(xhr.loaded/xhr.total*100).toFixed(0)}%`);
+  }, (err) => {
+    console.error('3D model load error:', err);
+  });
+
+  // Orbit controls (drag to rotate, but limited)
+  const controls = new OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true;
+  controls.dampingFactor = 0.08;
+  controls.enableZoom = false;
+  controls.enablePan = false;
+  controls.autoRotate = true;
+  controls.autoRotateSpeed = 0.8;
+  controls.minPolarAngle = Math.PI * 0.25;
+  controls.maxPolarAngle = Math.PI * 0.75;
+
+  // Resize
+  window.addEventListener('resize', () => {
+    camera.aspect = w()/h();
+    camera.updateProjectionMatrix();
+    renderer.setSize(w(), h());
+  });
+
+  // Animate
+  function animate() {
+    requestAnimationFrame(animate);
+    controls.update();
+    renderer.render(scene, camera);
+  }
+  animate();
+}
+</script>
+</body>
+</html>

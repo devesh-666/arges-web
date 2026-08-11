@@ -1,0 +1,29 @@
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Node
+node_modules/
+npm-debug.log*
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Build artifacts
+dist/
+build/
+.cache/
+
+# Screenshots (not needed in repo)
+shot_*.png
+hero3d_*.png
+*.pyc
+__pycache__/
+
+# Local env
+.env
+.env.local
