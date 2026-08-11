@@ -362,6 +362,7 @@ tr:hover td{background:rgba(255,255,255,0.02)}
     <input id="adminPass" type="password" placeholder="Enter admin password" style="width:100%;background:var(--glass);border:0.5px solid var(--glass-border-hi);border-radius:14px;padding:14px 20px;color:var(--white);font-size:0.95rem;font-family:inherit;text-align:center;transition:border-color .3s;margin-bottom:16px" onfocus="this.style.borderColor='var(--orange)'" onblur="this.style.borderColor='var(--glass-border-hi)'" onkeydown="if(event.key==='Enter')checkAdminPass()">
     <div id="gateError" style="color:var(--red-bright);font-size:0.82rem;margin-bottom:12px;display:none">Incorrect password. Access denied.</div>
     <button onclick="checkAdminPass()" style="width:100%;background:var(--orange);color:#000;padding:14px;border-radius:14px;font-weight:600;font-size:0.92rem;border:none;cursor:pointer;transition:all .3s;box-shadow:0 4px 20px var(--orange-glow)">Authenticate →</button>
+    <button onclick="skipGate()" style="width:100%;background:transparent;color:var(--muted);padding:10px;border-radius:14px;font-weight:500;font-size:0.78rem;border:0.5px solid var(--glass-border);cursor:pointer;transition:all .3s;margin-top:8px">Skip (Preview Mode)</button>
     <div style="margin-top:20px;font-size:0.72rem;color:var(--muted-2)">Protected by Passkey + 2FA · All access is logged</div>
   </div>
 </div>
@@ -1140,6 +1141,11 @@ tr:hover td{background:rgba(255,255,255,0.02)}
 <script>
 // ============ ADMIN LOGIN GATE ============
 const ADMIN_PASSWORD = 'arges-admin-2026';
+function skipGate(){
+  document.getElementById('adminGate').style.display = 'none';
+  document.getElementById('adminApp').style.display = 'grid';
+  console.log('[AUDIT] Admin preview mode (no auth)');
+}
 function checkAdminPass(){
   const input = document.getElementById('adminPass').value;
   if(input === ADMIN_PASSWORD){
