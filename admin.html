@@ -269,6 +269,38 @@ tr:hover td{background:rgba(255,255,255,0.02)}
 .page.active{display:block;animation:fadeIn .4s ease}
 @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 
+/* ==================== MAP SPLIT LAYOUT (store locator style) ==================== */
+.map-split{display:grid;grid-template-columns:380px 1fr;gap:20px;height:calc(100vh - 200px);min-height:600px}
+.map-list{overflow-y:auto;padding-right:4px}
+.map-list-header{position:sticky;top:0;background:rgba(5,5,12,0.9);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);padding:12px 0;z-index:5;border-bottom:0.5px solid var(--glass-border);margin-bottom:8px}
+.map-search{width:100%;background:var(--glass);border:0.5px solid var(--glass-border);border-radius:12px;padding:10px 14px 10px 40px;color:var(--white);font-size:0.85rem;font-family:inherit;margin-bottom:10px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%238B8B9A' stroke-width='1.5' viewBox='0 0 24 24'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:14px center}
+.map-search:focus{outline:none;border-color:var(--orange)}
+.map-list-title{font-size:0.78rem;color:var(--muted);font-weight:600;display:flex;align-items:center;justify-content:space-between}
+.map-card{padding:14px;border-radius:14px;background:rgba(255,255,255,0.02);border:0.5px solid var(--glass-border);margin-bottom:8px;cursor:pointer;transition:all .25s;display:flex;align-items:center;gap:12px}
+.map-card:hover{background:rgba(255,107,26,0.04);border-color:rgba(255,107,26,0.15)}
+.map-card.selected{background:rgba(255,107,26,0.06);border-color:var(--orange)}
+.map-card-avatar{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.82rem;flex-shrink:0}
+.map-card-avatar.blind{background:linear-gradient(135deg,var(--orange),var(--orange-bright));color:#000}
+.map-card-avatar.helper{background:linear-gradient(135deg,#7B1FA2,#AB47BC);color:#fff}
+.map-card-avatar.family{background:linear-gradient(135deg,#1565C0,#42A5F5);color:#fff}
+.map-card-info{flex:1;min-width:0}
+.map-card-name{font-weight:600;font-size:0.85rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.map-card-meta{font-size:0.72rem;color:var(--muted);margin-top:2px}
+.map-card-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+.map-map-container{position:relative;border-radius:24px;overflow:hidden;border:0.5px solid var(--glass-border-hi);box-shadow:0 16px 48px rgba(0,0,0,0.4)}
+.map-map-container #adminMap{height:100%;width:100%}
+.map-float-detail{position:absolute;bottom:20px;left:20px;right:20px;background:rgba(10,10,20,0.85);backdrop-filter:blur(40px) saturate(1.5);-webkit-backdrop-filter:blur(40px) saturate(1.5);border:0.5px solid var(--glass-border-hi);border-radius:20px;padding:20px;box-shadow:0 16px 48px rgba(0,0,0,0.6),inset 0 1px 0 rgba(255,255,255,0.1);z-index:1000;display:none;transition:all .4s}
+.map-float-detail.show{display:block;animation:fadeUp .4s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.map-detail-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.map-detail-close{background:var(--glass);border:0.5px solid var(--glass-border);width:28px;height:28px;border-radius:8px;color:var(--muted);cursor:none;display:flex;align-items:center;justify-content:center}
+.map-detail-close:hover{background:var(--glass-hi);color:var(--white)}
+.map-detail-body{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px}
+.map-detail-stat{padding:10px;border-radius:10px;background:rgba(255,255,255,0.02);border:0.5px solid var(--glass-border);text-align:center}
+.map-detail-stat .v{font-weight:700;font-family:'JetBrains Mono',monospace;font-size:1rem}
+.map-detail-stat .l{font-size:0.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-top:2px}
+@media(max-width:1024px){.map-split{grid-template-columns:1fr;height:auto}.map-list{max-height:300px}.map-map-container{height:400px}}
+
 /* ==================== SECURITY ==================== */
 .security-device{display:flex;align-items:center;justify-content:space-between;padding:14px;border-radius:14px;background:rgba(255,255,255,0.02);border:0.5px solid var(--glass-border);margin-bottom:10px;transition:all .3s}
 .security-device:hover{background:rgba(255,255,255,0.04);border-color:var(--glass-border-hi)}
@@ -826,22 +858,48 @@ tr:hover td{background:rgba(255,255,255,0.02)}
     <!-- ============ USER MAP PAGE ============ -->
     <div class="page" id="page-usermap">
       <div class="topbar">
-        <div><h1>User Map</h1><div class="subtitle">All ARGES users across India · Real-time locations</div></div>
+        <div><h1>User Map</h1><div class="subtitle">All ARGES users across India · Click a user to focus</div></div>
         <div class="topbar-actions">
-          <button class="btn btn-ghost btn-sm" onclick="filterMap('all')">All Users</button>
-          <button class="btn btn-ghost btn-sm" onclick="filterMap('blind')">Blind Only</button>
-          <button class="btn btn-ghost btn-sm" onclick="filterMap('online')">Online Only</button>
+          <button class="btn btn-ghost btn-sm" onclick="filterMap('all')">All</button>
+          <button class="btn btn-ghost btn-sm" onclick="filterMap('blind')">Blind</button>
+          <button class="btn btn-ghost btn-sm" onclick="filterMap('sos')">SOS</button>
         </div>
       </div>
-      <div class="stats-grid">
-        <div class="stat-card"><div class="stat-icon orange"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></div><div class="stat-value">923</div><div class="stat-label">Blind Users Mapped</div></div>
-        <div class="stat-card"><div class="stat-icon green"><svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div><div class="stat-value">836</div><div class="stat-label">Online Now</div></div>
-        <div class="stat-card"><div class="stat-icon red"><svg viewBox="0 0 24 24"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/></svg></div><div class="stat-value">3</div><div class="stat-label">SOS Active</div></div>
-        <div class="stat-card"><div class="stat-icon blue"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div><div class="stat-value">7</div><div class="stat-label">States Covered</div></div>
-      </div>
-      <div class="panel">
-        <div class="panel-header"><div><div class="panel-title">India — All Users</div><div class="panel-sub">Click markers for details · Dark theme map</div></div></div>
-        <div id="adminMap" style="height:500px;border-radius:20px;overflow:hidden;border:0.5px solid var(--glass-border-hi)"></div>
+      <div class="map-split">
+        <!-- LEFT: User List -->
+        <div class="map-list">
+          <div class="map-list-header">
+            <input class="map-search" placeholder="Search by name or city...">
+            <div class="map-list-title"><span>Users (923)</span><span style="color:var(--orange)">7 cities</span></div>
+          </div>
+          <div id="mapUserList"></div>
+        </div>
+        <!-- RIGHT: Map -->
+        <div class="map-map-container">
+          <div id="adminMap"></div>
+          <!-- Floating detail card (appears on marker click) -->
+          <div class="map-float-detail" id="mapFloatDetail">
+            <div class="map-detail-header">
+              <div style="display:flex;align-items:center;gap:12px">
+                <div class="map-card-avatar blind" id="detailAvatar">RA</div>
+                <div>
+                  <div style="font-weight:600;font-size:0.95rem" id="detailName">Ravi Kumar</div>
+                  <div style="font-size:0.72rem;color:var(--muted)" id="detailLoc">Coimbatore, Tamil Nadu</div>
+                </div>
+              </div>
+              <button class="map-detail-close" onclick="document.getElementById('mapFloatDetail').classList.remove('show')"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+            </div>
+            <div class="map-detail-body">
+              <div class="map-detail-stat"><div class="v" style="color:var(--green)" id="detailStatus">Online</div><div class="l">Status</div></div>
+              <div class="map-detail-stat"><div class="v" style="color:var(--orange)" id="detailBat">87%</div><div class="l">Battery</div></div>
+              <div class="map-detail-stat"><div class="v" style="color:var(--blue)" id="detailUpd">3m</div><div class="l">Updated</div></div>
+            </div>
+            <div style="display:flex;gap:8px">
+              <button class="btn btn-sm btn-ghost" style="flex:1">View Profile</button>
+              <button class="btn btn-sm" style="flex:1">View Device</button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -1574,50 +1632,92 @@ if(faceDisplay){
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 let adminMapMarkers=[];
+const mapUsers=[
+  {n:'Ravi Kumar',type:'blind',lat:11.0168,lng:76.9558,city:'Coimbatore, TN',status:'online',bat:'87%',upd:'3m',sos:false},
+  {n:'Anjali Rao',type:'blind',lat:12.9716,lng:77.5946,city:'Bengaluru, KA',status:'online',bat:'94%',upd:'8m',sos:false},
+  {n:'Priya Devi',type:'blind',lat:13.0827,lng:80.2707,city:'Chennai, TN',status:'online',bat:'42%',upd:'1m',sos:true},
+  {n:'Mohammed Irfan',type:'blind',lat:19.0760,lng:72.8777,city:'Mumbai, MH',status:'offline',bat:'—',upd:'2d',sos:false},
+  {n:'Sneha Reddy',type:'blind',lat:17.3850,lng:78.4867,city:'Hyderabad, TS',status:'online',bat:'71%',upd:'5m',sos:false},
+  {n:'Arjun Nair',type:'blind',lat:9.9312,lng:76.2673,city:'Kochi, KL',status:'online',bat:'23%',upd:'12m',sos:true},
+  {n:'Meena Krishnan',type:'blind',lat:11.0168,lng:76.9558,city:'Coimbatore, TN',status:'online',bat:'88%',upd:'2m',sos:false},
+  {n:'Vijay Kumar',type:'blind',lat:28.7041,lng:77.1025,city:'Delhi, DL',status:'online',bat:'55%',upd:'6m',sos:true},
+  {n:'Vikram Singh',type:'helper',lat:18.5204,lng:73.8567,city:'Pune, MH',status:'online',bat:'—',upd:'Now',sos:false},
+  {n:'Deepa Nair',type:'helper',lat:9.9312,lng:76.2673,city:'Kochi, KL',status:'online',bat:'—',upd:'4h',sos:false},
+];
+
 function initAdminMap(){
   if(window._adminMap) return;
   const el=document.getElementById('adminMap');
   if(!el||!el.offsetWidth) return;
+
+  // Populate user list
+  const list=document.getElementById('mapUserList');
+  list.innerHTML=mapUsers.map((u,i)=>`<div class="map-card" data-idx="${i}" onclick="selectMapUser(${i})">
+    <div class="map-card-avatar ${u.type}">${u.n.split(' ').map(x=>x[0]).join('').slice(0,2)}</div>
+    <div class="map-card-info"><div class="map-card-name">${u.n}</div><div class="map-card-meta">${u.city}</div></div>
+    <div class="map-card-right">
+      <span class="badge ${u.status==='online'?'green':'gray'}" style="font-size:0.6rem;padding:2px 7px"><span class="dot"></span>${u.status==='online'?'Online':'Offline'}</span>
+      ${u.sos?'<span class="badge red" style="font-size:0.55rem;padding:1px 6px">SOS</span>':''}
+    </div>
+  </div>`).join('');
+
+  // Init map
   const map=L.map(el,{zoomControl:true,attributionControl:false}).setView([20.5937,78.9629],5);
   L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{maxZoom:19}).addTo(map);
   window._adminMap=map;
-  // Major Indian cities with users
-  const cities=[
-    {lat:11.0168,lng:76.9558,n:'Coimbatore',blind:284,online:268,sos:0},
-    {lat:12.9716,lng:77.5946,n:'Bengaluru',blind:198,online:182,sos:1},
-    {lat:13.0827,lng:80.2707,n:'Chennai',blind:147,online:131,sos:1},
-    {lat:19.0760,lng:72.8777,n:'Mumbai',blind:112,online:98,sos:0},
-    {lat:17.3850,lng:78.4867,n:'Hyderabad',blind:89,online:81,sos:0},
-    {lat:28.7041,lng:77.1025,n:'Delhi',blind:54,online:47,sos:1},
-    {lat:9.9312,lng:76.2673,n:'Kochi',blind:39,online:35,sos:0},
-  ];
-  cities.forEach(c=>{
-    // Circle radius proportional to users
-    const radius=Math.max(5000,c.blind*200);
-    L.circle([c.lat,c.lng],{color:'#FF6B1A',fillColor:'#FF6B1A',fillOpacity:0.06,radius:radius}).addTo(map);
-    // Marker
-    const hasSos=c.sos>0;
-    const color=hasSos?'#EF5350':'#FF6B1A';
-    const icon=L.divIcon({html:'<div style="width:14px;height:14px;border-radius:50%;background:'+color+';box-shadow:0 0 12px '+color+'99;border:2px solid #fff'+(hasSos?';animation:pulse 2s infinite':'')+'"></div>',className:'',iconSize:[14,14],iconAnchor:[7,7]});
-    const m=L.marker([c.lat,c.lng],{icon}).addTo(map).bindPopup(
-      '<b>'+c.n+'</b><br>'+
-      (hasSos?'<span style="color:#EF5350">SOS ACTIVE</span><br>':'')+
-      'Blind users: '+c.blind+'<br>'+
-      'Online: '+c.online+'<br>'+
-      'SOS: '+c.sos
-    );
-    adminMapMarkers.push({marker:m,city:c});
+
+  // Add markers
+  mapUsers.forEach((u,i)=>{
+    const color=u.sos?'#EF5350':u.type==='helper'?'#AB47BC':'#FF6B1A';
+    const size=u.sos?18:14;
+    const icon=L.divIcon({html:'<div style="width:'+size+'px;height:'+size+'px;border-radius:50%;background:'+color+';box-shadow:0 0 14px '+color+'aa;border:2px solid #fff'+(u.sos?';animation:pulse 1.5s infinite':'')+'"></div>',className:'',iconSize:[size,size],iconAnchor:[size/2,size/2]});
+    const m=L.marker([u.lat,u.lng],{icon}).addTo(map);
+    m.on('click',()=>selectMapUser(i));
+    adminMapMarkers.push({marker:m,user:u,idx:i});
   });
 }
+
+function selectMapUser(idx){
+  const u=mapUsers[idx];
+  if(!u||!window._adminMap) return;
+  // Highlight in list
+  document.querySelectorAll('.map-card').forEach(c=>c.classList.remove('selected'));
+  document.querySelector('.map-card[data-idx="'+idx+'"]')?.classList.add('selected');
+  // Fly to location
+  window._adminMap.flyTo([u.lat,u.lng],10,{duration:1.2});
+  // Show floating detail
+  document.getElementById('detailName').textContent=u.n;
+  document.getElementById('detailLoc').textContent=u.city;
+  document.getElementById('detailStatus').textContent=u.status==='online'?'Online':'Offline';
+  document.getElementById('detailStatus').style.color=u.status==='online'?'var(--green)':'var(--muted)';
+  document.getElementById('detailBat').textContent=u.bat;
+  document.getElementById('detailUpd').textContent=u.upd;
+  document.getElementById('detailAvatar').className='map-card-avatar '+u.type;
+  document.getElementById('detailAvatar').textContent=u.n.split(' ').map(x=>x[0]).join('').slice(0,2);
+  document.getElementById('mapFloatDetail').classList.add('show');
+}
+
 function filterMap(type){
   if(!window._adminMap) return;
-  adminMapMarkers.forEach(m=>window._adminMap.removeLayer(m.marker));
   adminMapMarkers.forEach(item=>{
-    if(type==='all'||(type==='blind')||(type==='online'&&item.city.online>0)){
-      item.marker.addTo(window._adminMap);
-    }
+    window._adminMap.removeLayer(item.marker);
+    let show=false;
+    if(type==='all') show=true;
+    else if(type==='blind') show=item.user.type==='blind';
+    else if(type==='sos') show=item.user.sos;
+    if(show) item.marker.addTo(window._adminMap);
+  });
+  // Also filter list
+  document.querySelectorAll('.map-card').forEach((card,i)=>{
+    const u=mapUsers[i];
+    let show=false;
+    if(type==='all') show=true;
+    else if(type==='blind') show=u.type==='blind';
+    else if(type==='sos') show=u.sos;
+    card.style.display=show?'flex':'none';
   });
 }
+
 document.querySelector('.nav-item[data-page="usermap"]')?.addEventListener('click',()=>setTimeout(initAdminMap,200));
 </script>
 </body>
