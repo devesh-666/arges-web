@@ -268,6 +268,49 @@ tr:hover td{background:rgba(255,255,255,0.02)}
 .page{display:none}
 .page.active{display:block;animation:fadeIn .4s ease}
 @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* ==================== SECURITY ==================== */
+.security-device{display:flex;align-items:center;justify-content:space-between;padding:14px;border-radius:14px;background:rgba(255,255,255,0.02);border:0.5px solid var(--glass-border);margin-bottom:10px;transition:all .3s}
+.security-device:hover{background:rgba(255,255,255,0.04);border-color:var(--glass-border-hi)}
+.sec-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sec-icon svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.5}
+.sec-icon.key{background:rgba(255,107,26,0.08);color:var(--orange);border:0.5px solid rgba(255,107,26,0.15)}
+.sec-icon.shield{background:rgba(46,125,50,0.08);color:var(--green-bright);border:0.5px solid rgba(46,125,50,0.15)}
+.sec-icon.phone{background:rgba(21,101,192,0.08);color:#42A5F5;border:0.5px solid rgba(21,101,192,0.15)}
+.sec-icon.face{background:rgba(123,31,162,0.08);color:#AB47BC;border:0.5px solid rgba(123,31,162,0.15)}
+
+.passkey-card{padding:16px;border-radius:14px;background:rgba(255,107,26,0.04);border:0.5px solid rgba(255,107,26,0.15);margin-bottom:10px;display:flex;align-items:center;gap:14px}
+.face-id-display{width:120px;height:120px;border-radius:50%;margin:0 auto;background:radial-gradient(circle,rgba(123,31,162,0.2),rgba(123,31,162,0.05));border:2px solid rgba(123,31,162,0.3);display:flex;align-items:center;justify-content:center;position:relative}
+.face-id-display svg{width:60px;height:60px;stroke:var(--purple);fill:none;stroke-width:1.5;opacity:0.5}
+.face-id-display::after{content:'';position:absolute;inset:-4px;border-radius:50%;border:1px dashed rgba(123,31,162,0.2);animation:faceScan 3s linear infinite}
+@keyframes faceScan{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+.face-id-display.scanning::after{border-color:var(--orange);animation-duration:1.5s}
+
+.accuracy-meter{height:8px;background:var(--glass-border-hi);border-radius:999px;overflow:hidden;position:relative}
+.accuracy-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--red-bright),var(--yellow),var(--green-bright));transition:width .5s}
+.accuracy-marker{position:absolute;top:-3px;width:2px;height:14px;background:var(--white);border-radius:1px}
+
+.log-entry{display:flex;gap:12px;padding:12px 0;border-bottom:0.5px solid rgba(255,255,255,0.04);align-items:flex-start}
+.log-entry:last-child{border-bottom:none}
+.log-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:6px}
+.log-dot.create{background:var(--green-bright)}
+.log-dot.update{background:var(--yellow)}
+.log-dot.delete{background:var(--red-bright)}
+.log-dot.access{background:var(--blue)}
+.log-dot.security{background:var(--orange)}
+.log-content{flex:1;font-size:0.82rem}
+.log-meta{font-size:0.7rem;color:var(--muted);font-family:'JetBrains Mono',monospace;margin-top:2px}
+
+.fin-metric{padding:20px;border-radius:16px;background:rgba(255,255,255,0.02);border:0.5px solid var(--glass-border);transition:all .3s}
+.fin-metric:hover{background:rgba(255,255,255,0.04);border-color:var(--glass-border-hi)}
+.fin-label{font-size:0.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.12em;margin-bottom:8px}
+.fin-value{font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:1.8rem;letter-spacing:-0.02em}
+.fin-trend{font-size:0.72rem;margin-top:6px;font-family:'JetBrains Mono',monospace}
+
+.tree-node{display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;transition:transform .3s}
+.tree-node:hover{transform:scale(1.05)}
+.tree-connector{width:1px;background:var(--glass-border-hi)}
+.tree-h-line{height:1px;background:var(--glass-border-hi)}
 </style>
 </head>
 <body>
@@ -295,6 +338,10 @@ tr:hover td{background:rgba(255,255,255,0.02)}
         <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
         Analytics
       </div>
+      <div class="nav-item" data-page="financial">
+        <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        Financial
+      </div>
     </div>
 
     <div class="nav-section">
@@ -318,6 +365,24 @@ tr:hover td{background:rgba(255,255,255,0.02)}
         <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
         Helpers
         <span class="nav-badge">486</span>
+      </div>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">Security</div>
+      <div class="nav-item" data-page="security">
+        <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        Security
+        <span class="nav-badge green">2FA</span>
+      </div>
+      <div class="nav-item" data-page="faceverify">
+        <svg viewBox="0 0 24 24"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/><circle cx="8" cy="12" r="2"/></svg>
+        Face Verify
+        <span class="nav-badge red">2</span>
+      </div>
+      <div class="nav-item" data-page="audit">
+        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        Audit Logs
       </div>
     </div>
 
@@ -739,7 +804,170 @@ tr:hover td{background:rgba(255,255,255,0.02)}
       </div>
     </div>
 
-    <!-- ============ ANALYTICS PAGE ============ -->
+    <!-- ============ SECURITY PAGE ============ -->
+    <div class="page" id="page-security">
+      <div class="topbar">
+        <div><h1>Security</h1><div class="subtitle">Authentication, sessions, and access control</div></div>
+        <div class="topbar-actions"><span class="badge green"><span class="dot"></span>Secured</span></div>
+      </div>
+      <div class="grid-2">
+        <!-- Passkeys -->
+        <div class="panel">
+          <div class="panel-header"><div><div class="panel-title">Passkeys (WebAuthn)</div><div class="panel-sub">Passwordless biometric login</div></div><button class="btn btn-ghost btn-sm">+ Add Passkey</button></div>
+          <div class="passkey-card">
+            <div class="sec-icon key"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><circle cx="12" cy="16" r="1"/></svg></div>
+            <div style="flex:1"><div style="font-weight:600;font-size:0.9rem">Windows Hello</div><div style="font-size:0.75rem;color:var(--muted)">This laptop · Created Aug 1, 2026</div></div>
+            <span class="badge green">Active</span>
+          </div>
+          <div class="passkey-card">
+            <div class="sec-icon phone"><svg viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12" y2="18"/></svg></div>
+            <div style="flex:1"><div style="font-weight:600;font-size:0.9rem">iPhone 15 Pro (Face ID)</div><div style="font-size:0.75rem;color:var(--muted)">Mobile · Created Jul 15, 2026</div></div>
+            <span class="badge green">Active</span>
+          </div>
+          <div class="passkey-card">
+            <div class="sec-icon key"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
+            <div style="flex:1"><div style="font-weight:600;font-size:0.9rem">YubiKey 5C NFC</div><div style="font-size:0.75rem;color:var(--muted)">Hardware key · Created Jun 20, 2026</div></div>
+            <span class="badge yellow">Backup</span>
+          </div>
+        </div>
+        <!-- 2FA + Sessions -->
+        <div style="display:flex;flex-direction:column;gap:20px">
+          <div class="panel">
+            <div class="panel-header"><div><div class="panel-title">Two-Factor Authentication</div></div><span class="badge green">Enabled</span></div>
+            <div class="security-device"><div style="display:flex;align-items:center;gap:14px"><div class="sec-icon shield"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><div><div style="font-size:0.88rem;font-weight:600">TOTP (Google Authenticator)</div><div style="font-size:0.75rem;color:var(--muted)">6-digit code · 30s rotation</div></div></div><button class="btn btn-ghost btn-sm">Reconfigure</button></div>
+            <div class="security-device"><div style="display:flex;align-items:center;gap:14px"><div class="sec-icon shield"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div><div><div style="font-size:0.88rem;font-weight:600">Backup Codes</div><div style="font-size:0.75rem;color:var(--muted)">8 codes remaining</div></div></div><button class="btn btn-ghost btn-sm">View Codes</button></div>
+          </div>
+          <div class="panel">
+            <div class="panel-header"><div><div class="panel-title">Active Sessions</div><div class="panel-sub">Devices currently logged in</div></div></div>
+            <div class="security-device"><div style="display:flex;align-items:center;gap:14px"><div class="sec-icon phone"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/></svg></div><div><div style="font-size:0.88rem;font-weight:600">Chrome · Windows</div><div style="font-size:0.72rem;color:var(--muted);font-family:'JetBrains Mono',monospace">Salem, TN · 103.45.x.x · Now</div></div></div><span class="badge green">This device</span></div>
+            <div class="security-device"><div style="display:flex;align-items:center;gap:14px"><div class="sec-icon phone"><svg viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/></svg></div><div><div style="font-size:0.88rem;font-weight:600">Safari · iPhone 15</div><div style="font-size:0.72rem;color:var(--muted);font-family:'JetBrains Mono',monospace">Coimbatore · 49.36.x.x · 2h ago</div></div></div><button class="action-btn danger"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+          </div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-header"><div><div class="panel-title">Login History</div><div class="panel-sub">Last 10 authentication events</div></div></div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Device</th><th>IP</th><th>Location</th><th>Method</th><th>Time</th><th>Status</th></tr></thead>
+          <tbody id="loginHistoryBody"></tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <!-- ============ FACE VERIFY PAGE ============ -->
+    <div class="page" id="page-faceverify">
+      <div class="topbar">
+        <div><h1>Face Verification</h1><div class="subtitle">Anti-transfer detection · On-device face ID</div></div>
+        <div class="topbar-actions"><span class="badge orange"><span class="dot"></span>2 Unverified Wearers</span></div>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-icon purple"><svg viewBox="0 0 24 24"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/><circle cx="8" cy="12" r="2"/></svg></div><div class="stat-value">99.7%</div><div class="stat-label">Model Accuracy</div></div>
+        <div class="stat-card"><div class="stat-icon green"><svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div><div class="stat-value">1,841</div><div class="stat-label">Verified Wearers</div></div>
+        <div class="stat-card"><div class="stat-icon red"><svg viewBox="0 0 24 24"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/></svg></div><div class="stat-value">2</div><div class="stat-label">Unverified (Flagged)</div></div>
+        <div class="stat-card"><div class="stat-icon orange"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div class="stat-value">5 min</div><div class="stat-label">Check Interval</div></div>
+      </div>
+      <div class="grid-2">
+        <div class="panel">
+          <div class="panel-header"><div><div class="panel-title">How It Works</div></div></div>
+          <div style="padding:12px 0">
+            <div style="display:flex;gap:14px;padding:12px 0;border-bottom:0.5px solid rgba(255,255,255,0.04)">
+              <div style="width:28px;height:28px;border-radius:8px;background:var(--orange);color:#000;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.78rem;flex-shrink:0">1</div>
+              <div><div style="font-size:0.88rem;font-weight:600;margin-bottom:4px">Enrollment</div><div style="font-size:0.8rem;color:var(--muted);line-height:1.5">During setup, the blind user's face is captured from 5 angles. A 128-dimensional face embedding is generated using MobileFaceNet and stored on-device only.</div></div>
+            </div>
+            <div style="display:flex;gap:14px;padding:12px 0;border-bottom:0.5px solid rgba(255,255,255,0.04)">
+              <div style="width:28px;height:28px;border-radius:8px;background:var(--orange);color:#000;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.78rem;flex-shrink:0">2</div>
+              <div><div style="font-size:0.88rem;font-weight:600;margin-bottom:4px">Periodic Verification</div><div style="font-size:0.8rem;color:var(--muted);line-height:1.5">Every 5 minutes, the camera captures a frame and compares the current wearer's face embedding against the enrolled one. Uses cosine similarity with threshold 0.65 (99.7% accuracy).</div></div>
+            </div>
+            <div style="display:flex;gap:14px;padding:12px 0;border-bottom:0.5px solid rgba(255,255,255,0.04)">
+              <div style="width:28px;height:28px;border-radius:8px;background:var(--red-bright);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.78rem;flex-shrink:0">3</div>
+              <div><div style="font-size:0.88rem;font-weight:600;margin-bottom:4px">Transfer Detection</div><div style="font-size:0.8rem;color:var(--muted);line-height:1.5">If the face doesn't match for 2 consecutive checks (10 min), the device is flagged. All family members + admins receive an instant alert: "ARGES may be worn by someone else."</div></div>
+            </div>
+            <div style="display:flex;gap:14px;padding:12px 0">
+              <div style="width:28px;height:28px;border-radius:8px;background:var(--red-bright);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.78rem;flex-shrink:0">4</div>
+              <div><div style="font-size:0.88rem;font-weight:600;margin-bottom:4px">Auto-Lock</div><div style="font-size:0.8rem;color:var(--muted);line-height:1.5">After 3 failed checks, the device locks and requires the blind user's registered phone to unlock via passkey. Only the rightful owner can restore it.</div></div>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:20px">
+          <div class="panel" style="text-align:center">
+            <div class="panel-header"><div><div class="panel-title">Model Configuration</div></div></div>
+            <div class="face-id-display" id="faceIdDisplay">
+              <svg viewBox="0 0 24 24"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/><circle cx="8" cy="12" r="2"/></svg>
+            </div>
+            <div style="margin-top:16px">
+              <div style="font-size:0.78rem;color:var(--muted);margin-bottom:8px">Model: MobileFaceNet (INT8 quantized) · 4.2MB</div>
+              <div style="margin-bottom:6px;font-size:0.82rem;display:flex;justify-content:space-between"><span>Accuracy Threshold</span><span style="font-family:'JetBrains Mono',monospace;color:var(--green-bright)">99.7%</span></div>
+              <div class="accuracy-meter"><div class="accuracy-fill" style="width:97%"></div><div class="accuracy-marker" style="left:95%"></div></div>
+              <div style="font-size:0.66rem;color:var(--muted);margin-top:6px;display:flex;justify-content:space-between"><span>Insecure (low)</span><span>Balanced</span><span>Strict (high)</span></div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-header"><div><div class="panel-title">Flagged Devices</div><div class="panel-sub">Unverified wearers detected</div></div></div>
+            <div class="table-wrap"><table>
+              <thead><tr><th>Device</th><th>User</th><th>Last Verified</th><th>Actions</th></tr></thead>
+              <tbody id="flaggedDevicesBody"></tbody>
+            </table></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ AUDIT LOGS PAGE ============ -->
+    <div class="page" id="page-audit">
+      <div class="topbar">
+        <div><h1>Audit Logs</h1><div class="subtitle">Every admin action is recorded and immutable</div></div>
+        <div class="topbar-actions">
+          <select class="form-select" style="width:auto;padding:8px 16px"><option>All Actions</option><option>Create</option><option>Update</option><option>Delete</option><option>Access</option><option>Security</option></select>
+          <button class="btn btn-ghost">Export (DPDP)</button>
+        </div>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-icon blue"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div class="stat-value">14,287</div><div class="stat-label">Total Events (30d)</div></div>
+        <div class="stat-card"><div class="stat-icon green"><svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div><div class="stat-value">472</div><div class="stat-label">Today's Events</div></div>
+        <div class="stat-card"><div class="stat-icon orange"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div class="stat-value">7</div><div class="stat-label">High-Risk Actions</div></div>
+        <div class="stat-card"><div class="stat-icon red"><svg viewBox="0 0 24 24"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/></svg></div><div class="stat-value">0</div><div class="stat-label">Failed Access Attempts</div></div>
+      </div>
+      <div class="panel">
+        <div class="panel-header"><div><div class="panel-title">Action Timeline</div><div class="panel-sub">Immutable · Tamper-proof · Blockchain-hashed</div></div></div>
+        <div id="auditLogBody" style="max-height:500px;overflow-y:auto"></div>
+      </div>
+    </div>
+
+    <!-- ============ FINANCIAL PAGE ============ -->
+    <div class="page" id="page-financial">
+      <div class="topbar">
+        <div><h1>Financial</h1><div class="subtitle">Revenue, subscriptions, and unit economics</div></div>
+        <div class="topbar-actions">
+          <select class="form-select" style="width:auto;padding:8px 16px"><option>This Month</option><option>This Quarter</option><option>This Year</option></select>
+          <button class="btn btn-ghost">Export Report</button>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px" id="finMetrics"></div>
+      <div class="grid-2">
+        <div class="panel">
+          <div class="panel-header"><div><div class="panel-title">Revenue (Monthly)</div><div class="panel-sub">Last 8 months</div></div></div>
+          <div id="revenueChart" style="height:180px;display:flex;align-items:flex-end;gap:8px;padding:0 8px"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-header"><div><div class="panel-title">Subscription Tiers</div></div></div>
+          <div style="padding:8px 0">
+            <div class="health-row"><div class="health-label" style="color:var(--orange-bright)">ARGES One (₹9,999)</div><div class="health-value">614 units · ₹61.3L</div></div>
+            <div class="health-row"><div class="health-label" style="color:var(--green-bright)">ARGES Family (₹12,999)</div><div class="health-value">309 units · ₹40.2L</div></div>
+            <div class="health-row"><div class="health-label" style="color:#AB47BC">ARGES Care (₹49/mo)</div><div class="health-value">287 active · ₹1.4L/mo</div></div>
+            <div class="health-row"><div class="health-label" style="color:var(--blue)">NGO/Govt Bulk (₹7,499)</div><div class="health-value">47 units · ₹3.5L</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-header"><div><div class="panel-title">Unit Economics</div></div></div>
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:16px;padding:8px 0">
+          <div class="fin-metric"><div class="fin-label">COGS</div><div class="fin-value" style="font-size:1.4rem">₹5,100</div><div class="fin-trend" style="color:var(--red-bright)">per unit</div></div>
+          <div class="fin-metric"><div class="fin-label">Avg Sale</div><div class="fin-value" style="font-size:1.4rem">₹10,847</div><div class="fin-trend" style="color:var(--green-bright)">blended</div></div>
+          <div class="fin-metric"><div class="fin-label">Gross Margin</div><div class="fin-value" style="font-size:1.4rem;color:var(--green-bright)">53%</div><div class="fin-trend up">↑ 4% QoQ</div></div>
+          <div class="fin-metric"><div class="fin-label">LTV</div><div class="fin-value" style="font-size:1.4rem">₹14,231</div><div class="fin-trend" style="color:var(--muted)">incl. subscription</div></div>
+          <div class="fin-metric"><div class="fin-label">CAC</div><div class="fin-value" style="font-size:1.4rem">₹890</div><div class="fin-trend up">organic-heavy</div></div>
+        </div>
+      </div>
+    </div>
     <div class="page" id="page-analytics">
       <div class="topbar">
         <div><h1>Analytics</h1><div class="subtitle">Growth, usage, and engagement insights</div></div>
@@ -904,6 +1132,17 @@ tr:hover td{background:rgba(255,255,255,0.02)}
     </div>
     <div class="form-group"><label class="form-label">Contact Email</label><input class="form-input" type="email" placeholder="family@email.com"></div>
     <div class="modal-actions"><button class="btn btn-ghost" onclick="closeModal('addFamily')">Cancel</button><button class="btn" onclick="closeModal('addFamily')">Create Family</button></div>
+  </div>
+</div>
+
+<!-- ============ FAMILY TREE VIEWER MODAL (click any user → see their tree) ============ -->
+<div class="modal-overlay" id="modal-familyTree">
+  <div class="modal" style="position:relative;max-width:680px">
+    <button class="modal-close" onclick="closeModal('familyTree')"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    <h2 id="treeModalName">Ravi Kumar's Family</h2>
+    <p>Click a member to view their dashboard or remove them from the tree.</p>
+    <div id="treeModalContent" style="padding:20px 0;display:flex;flex-direction:column;align-items:center;gap:16px"></div>
+    <div class="modal-actions"><button class="btn btn-ghost" onclick="closeModal('familyTree')">Close</button><button class="btn btn-ghost" onclick="closeModal('familyTree')" style="border-color:var(--red-bright);color:var(--red-bright)">Reset Tree</button><button class="btn" onclick="closeModal('familyTree')">+ Add Member</button></div>
   </div>
 </div>
 
@@ -1099,6 +1338,177 @@ if(geoGrid){
     <div style="font-size:0.66rem;color:var(--muted);margin-top:4px">${g.pct}% of total</div>
   </div>`).join('');
 }
+
+// ============ LOGIN HISTORY (Security page) ============
+const mockLogin=[
+  {device:'Chrome · Windows',ip:'103.45.x.x',loc:'Salem, TN',method:'Passkey',time:'Just now',ok:true},
+  {device:'Safari · iPhone 15',ip:'49.36.x.x',loc:'Coimbatore, TN',method:'Passkey',time:'2h ago',ok:true},
+  {device:'Chrome · Windows',ip:'103.45.x.x',loc:'Salem, TN',method:'TOTP',time:'Yesterday',ok:true},
+  {device:'Firefox · Linux',ip:'157.32.x.x',loc:'Mumbai, MH',method:'Password',time:'3d ago',ok:false},
+  {device:'Chrome · Android',ip:'103.45.x.x',loc:'Salem, TN',method:'Passkey',time:'5d ago',ok:true},
+  {device:'Safari · macOS',ip:'27.59.x.x',loc:'Bengaluru, KA',method:'TOTP',time:'1w ago',ok:true},
+];
+const lhBody=document.getElementById('loginHistoryBody');
+if(lhBody){
+  lhBody.innerHTML=mockLogin.map(l=>`<tr>
+    <td style="font-size:0.82rem">${l.device}</td>
+    <td style="font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--muted)">${l.ip}</td>
+    <td style="font-size:0.82rem;color:var(--muted)">${l.loc}</td>
+    <td><span class="badge ${l.method==='Passkey'?'orange':'gray'}">${l.method}</span></td>
+    <td style="font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--muted)">${l.time}</td>
+    <td><span class="badge ${l.ok?'green':'red'}"><span class="dot"></span>${l.ok?'Success':'Blocked'}</span></td>
+  </tr>`).join('');
+}
+
+// ============ FLAGGED DEVICES (Face Verify page) ============
+const mockFlagged=[
+  {dev:'ARGES-0734',user:'Arjun Nair',last:'12m ago'},
+  {dev:'ARGES-0891',user:'Meena Krishnan',last:'45m ago'},
+];
+const fdBody=document.getElementById('flaggedDevicesBody');
+if(fdBody){
+  fdBody.innerHTML=mockFlagged.map(f=>`<tr>
+    <td><span style="font-family:'JetBrains Mono',monospace;font-size:0.82rem">${f.dev}</span></td>
+    <td><div class="user-cell"><div class="user-avatar blind" style="width:28px;height:28px;font-size:0.7rem">${f.user.split(' ').map(x=>x[0]).join('')}</div><span style="font-size:0.85rem">${f.user}</span></div></td>
+    <td style="font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--red-bright)">${f.last}</td>
+    <td>
+      <button class="action-btn" title="Notify Family"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></button>
+      <button class="action-btn danger" title="Remote Lock"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></button>
+    </td>
+  </tr>`).join('');
+}
+
+// ============ AUDIT LOG ============
+const mockAudit=[
+  {type:'security',action:'Remote-locked device ARGES-0734 (failed face verify)',who:'admin@arges',when:'2m ago'},
+  {type:'access',action:'Impersonated user: Ravi Kumar (support ticket #4892)',who:'admin@arges',when:'18m ago'},
+  {type:'create',action:'Pushed OTA v2.2.0 to 100% of devices',who:'admin@arges',when:'1h ago'},
+  {type:'delete',action:'Suspended user: Priya Devi (violation of ToS)',who:'admin@arges',when:'2h ago'},
+  {type:'security',action:'Flagged device ARGES-0891 — face verification failed 3x',who:'system',when:'3h ago'},
+  {type:'update',action:'Updated feature flag: MediScan → ENABLED',who:'admin@arges',when:'5h ago'},
+  {type:'access',action:'Override accessed device ARGES-0014 (emergency SOS)',who:'admin@arges',when:'6h ago'},
+  {type:'create',action:'Created new family tree for Sneha Reddy',who:'admin@arges',when:'8h ago'},
+  {type:'security',action:'New passkey added: Windows Hello',who:'admin@arges',when:'12h ago'},
+  {type:'update',action:'Updated consent timeout from 20s → 30s',who:'admin@arges',when:'1d ago'},
+  {type:'access',action:'Exported DPDP compliance report (14,287 records)',who:'admin@arges',when:'1d ago'},
+  {type:'delete',action:'Revoked API key: partner_sailog_3x7K',who:'admin@arges',when:'2d ago'},
+];
+const auditBody=document.getElementById('auditLogBody');
+if(auditBody){
+  auditBody.innerHTML=mockAudit.map(a=>`<div class="log-entry">
+    <div class="log-dot ${a.type}"></div>
+    <div class="log-content"><div>${a.action}</div><div class="log-meta">${a.who} · ${a.when}</div></div>
+    <span class="badge ${a.type==='delete'?'red':a.type==='security'?'orange':a.type==='access'?'gray':'green'}" style="text-transform:capitalize">${a.type}</span>
+  </div>`).join('');
+}
+
+// ============ FINANCIAL METRICS ============
+const finMetrics=document.getElementById('finMetrics');
+if(finMetrics){
+  const metrics=[
+    {label:'Revenue (MTD)',value:'₹8.4L',trend:'↑ 18%',up:true},
+    {label:'MRR (Recurring)',value:'₹1.4L',trend:'↑ 12%',up:true},
+    {label:'Active Subscriptions',value:'287',trend:'↑ 23',up:true},
+    {label:'Avg Order Value',value:'₹10,847',trend:'↑ ₹340',up:true},
+  ];
+  finMetrics.innerHTML=metrics.map(m=>`<div class="fin-metric">
+    <div class="fin-label">${m.label}</div>
+    <div class="fin-value">${m.value}</div>
+    <div class="fin-trend ${m.up?'up':'down'}">${m.trend}</div>
+  </div>`).join('');
+}
+
+// ============ REVENUE CHART ============
+const revChart=document.getElementById('revenueChart');
+if(revChart){
+  const data=[3.2,4.1,3.8,5.2,6.1,5.8,7.3,8.4]; // in lakhs
+  const max=Math.max(...data);
+  revChart.innerHTML=data.map((v,i)=>{
+    const h=(v/max*100);
+    const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug'];
+    return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px">
+      <div style="font-size:0.62rem;font-family:'JetBrains Mono',monospace;color:var(--muted)">₹${v}L</div>
+      <div style="width:100%;height:${h}%;background:linear-gradient(to top,var(--green-bright),#66BB6A);border-radius:4px 4px 0 0;opacity:0.9;min-height:4px"></div>
+      <div style="font-size:0.65rem;color:var(--muted)">${months[i]}</div>
+    </div>`;
+  }).join('');
+}
+
+// ============ FAMILY TREE MODAL (click any user → see their tree) ============
+const familyTrees = {
+  'Ravi Kumar': {
+    blind:{n:'Ravi Kumar',avatar:'RA'},
+    members:[
+      {n:'Lakshmi Ammal',rel:'Mother',avatar:'LA'},
+      {n:'Suresh Kumar',rel:'Father',avatar:'SU'},
+      {n:'Karthik Ravi',rel:'Brother',avatar:'KA'},
+      {n:'Priya Ravi',rel:'Sister',avatar:'PR'},
+    ]
+  },
+  'Priya Devi': {
+    blind:{n:'Priya Devi',avatar:'PD'},
+    members:[
+      {n:'Ramesh Gupta',rel:'Uncle',avatar:'RG'},
+      {n:'Sunita Gupta',rel:'Aunt',avatar:'SG'},
+    ]
+  },
+  'Anjali Rao': {
+    blind:{n:'Anjali Rao',avatar:'AN'},
+    members:[
+      {n:'Suresh Patel',rel:'Father',avatar:'SP'},
+      {n:'Lakshmi Patel',rel:'Mother',avatar:'LP'},
+      {n:'Rohan Patel',rel:'Cousin',avatar:'RO'},
+    ]
+  },
+};
+
+function showFamilyTree(userName){
+  const tree = familyTrees[userName];
+  if(!tree) return alert('No family tree found for '+userName);
+  document.getElementById('treeModalName').textContent = userName + "'s Family";
+  const c = document.getElementById('treeModalContent');
+  // Build visual tree
+  let html = '';
+  // Blind user at top
+  html += `<div class="tree-node"><div class="user-avatar blind" style="width:56px;height:56px;font-size:1.1rem">${tree.blind.avatar}</div><div style="text-align:center"><div style="font-weight:600;font-size:0.9rem">${tree.blind.n}</div><div style="font-size:0.72rem;color:var(--orange)">Blind User</div></div></div>`;
+  if(tree.members.length>0){
+    html += '<div class="tree-connector" style="height:20px"></div>';
+    html += '<div class="tree-h-line" style="width:'+(tree.members.length*100)+'px"></div>';
+    html += '<div style="display:flex;gap:20px;justify-content:center">';
+    tree.members.forEach(m=>{
+      html += `<div style="display:flex;flex-direction:column;align-items:center">
+        <div class="tree-connector" style="height:20px"></div>
+        <div class="tree-node"><div class="user-avatar family" style="width:48px;height:48px;font-size:0.9rem">${m.avatar}</div><div style="text-align:center;margin-top:6px"><div style="font-size:0.8rem;font-weight:600">${m.n}</div><div style="font-size:0.66rem;color:var(--muted)">${m.rel}</div></div></div>
+      </div>`;
+    });
+    html += '</div>';
+  }
+  c.innerHTML = html;
+  openModal('familyTree');
+}
+
+// Make user rows clickable to open family tree
+document.addEventListener('click',e=>{
+  const row = e.target.closest('tr');
+  if(!row) return;
+  const nameEl = row.querySelector('.user-name');
+  if(nameEl){
+    const name = nameEl.textContent.trim();
+    if(familyTrees[name]){
+      showFamilyTree(name);
+    }
+  }
+});
+
+// Face ID display animation
+const faceDisplay=document.getElementById('faceIdDisplay');
+if(faceDisplay){
+  setInterval(()=>{
+    faceDisplay.classList.add('scanning');
+    setTimeout(()=>faceDisplay.classList.remove('scanning'),2000);
+  },4000);
+}
+
 </script>
 </body>
 </html>
